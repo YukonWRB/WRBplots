@@ -13,7 +13,9 @@ library(data.table)
 library(ggplot2)
 library(cowplot)
 
-#' Title Graphing utility for YOWN wells
+#' Graphing utility for YOWN wells
+#'
+#' Create standardized graphs for YOWN wells from data hosted on the Aquarius server. Each graph contains information specific to the site and the time-series requested, and is complemented by the YG and water logos in the upper corners. Saves the graph to the path specified by the user.
 #'
 #' @param AQTSServerID The web address of your Aquarius server.
 #' @param AQTSUsername The Aquarius username you wish to use.

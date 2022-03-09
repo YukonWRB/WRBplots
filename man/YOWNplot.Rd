@@ -2,7 +2,7 @@
 % Please edit documentation in R/YOWNplot.R
 \name{YOWNplot}
 \alias{YOWNplot}
-\title{Title Graphing utility for YOWN wells}
+\title{Graphing utility for YOWN wells}
 \usage{
 YOWNplot(
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS",
@@ -45,5 +45,5 @@ YOWNplot(
 A .png image of the time series with Yukon logos, saved to the directory specified in saveTo.
 }
 \description{
-Title Graphing utility for YOWN wells
+Create standardized graphs for YOWN wells from data hosted on the Aquarius server. Each graph contains information specific to the site and the time-series requested, and is complemented by the YG and water logos in the upper corners. Saves the graph to the path specified by the user.
 }
