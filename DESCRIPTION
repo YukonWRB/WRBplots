@@ -1,0 +1,13 @@
+Package: WRBplots
+Title: Make pretty, standard plots for a variety of WRB uses
+Version: 0.0.0.9000
+Authors@R: 
+    person("Ghislain", "de Laplante", , "ghislain.delaplante@yukon.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5093-9185"))
+Description: Functions that facilitate the generation of custom plots from data downloaded from Aquarius.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+   ggplot2, plyr, dplyr, grid, cowplot, data.table, methods, magrittr
