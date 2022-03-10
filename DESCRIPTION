@@ -13,8 +13,10 @@ Imports:
    ggplot2, plyr, dplyr, grid, cowplot, data.table, methods, magrittr, utils
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
 LazyData: true
+Config/testthat/edition: 3

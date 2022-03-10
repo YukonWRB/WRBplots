@@ -14,7 +14,7 @@ YOWNplot(
   timeSeriesID = "Water Temp.TEMPERATURE",
   chartXInterval = "1 year",
   chartType = "Temperature",
-  saveTo = "C:/Users/gtdelapl/Desktop",
+  saveTo = "C:/Users/g_del/Desktop",
   specName = NULL
 )
 }
