@@ -1,6 +1,7 @@
 ---
 title: "WRBplots"
 output: rmarkdown::html_vignette
+description: Documentation to support the use of the WRBplots package. This package contains functions for generating custom plots for the Water Resources Branch, including in the Groundwater, Hydrology, and Water Quality disciplines.
 vignette: >
   %\VignetteIndexEntry{WRBplots}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,3 +18,24 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(WRBplots)
 ```
+
+***
+
+## List of functions and their purpose
+
+&nbsp;
+
+NOTE: Access help files (including usage instructions) for each function using the ?function command.
+
+&nbsp;
+
+#### YOWNplot()
+Generates WRB-custom plots of well level, temperature, and conductivity from data hosted on the Aquarius server. Custom date and time ranges can be set, or defaults to the entire time-series.
+
+&nbsp;
+
+#### timeseries_client()
+Helper function for all other functions that fetch data directly from Aquarius. Does not need to be called on its own, use the other functions instead to simplify your life.
+
+&nbsp;
+
