@@ -1,6 +1,3 @@
-# YOWN Aquarius Interface and Plotting
-# November 2021
-# Reads level data from input Aquarius time series and outputs a plot to a designated folder
 # Code by Cole Fischer, Groundwater Technologist, YG-ENV-WRB-GW-OPS. Adapted by Ghislain de Laplante, Climate Change and Water Data Scientist, to work as a function without magick package.
 # Aquarius code package (dependency) by Touraj Farahmand 2017-10-01
 
@@ -245,9 +242,11 @@ specName=NULL
 
 
   # Final output and aesthetics
+  data(Logo)
+  data(Water)
   finalplot <- cowplot::ggdraw(plot) +
-    cowplot::draw_image("data/YGLogo.png", scale=0.16, vjust=-0.42, halign=-0.02) +
-    cowplot::draw_image("data/YGWater.png", scale=0.18, vjust=-0.4, halign=1)
+    cowplot::draw_image(Logo, scale=0.16, vjust=-0.42, halign=-0.02) +
+    cowplot::draw_image(Water, scale=0.18, vjust=-0.4, halign=1)
 
 
   #save the file

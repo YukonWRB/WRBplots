@@ -2,6 +2,7 @@
 
 export("%>%")
 export(YOWNplot)
+exportClasses(timeseriesClient)
 importFrom(ggplot2,aes)
 importFrom(ggplot2,element_rect)
 importFrom(ggplot2,element_text)
