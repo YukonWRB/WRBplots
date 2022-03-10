@@ -40,20 +40,20 @@ library(cowplot)
 #YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQTSUsername, AQTSPassword, dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID, timeSeriesID="Wlevel_btoc.Calculated", chartXInterval="1 year", chartType="Level", saveTo="//envgeoserver/share/WaterResources/Groundwater/YOWN_WL_CHART_OUTPUTS", specName=NULL) {
 
 #Use the code below to run the function with everything preset, by calling YOWNplot().
-YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQTSUsername="gtdelapl", AQTSPassword="WQ*2021!", dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/gtdelapl/Desktop", specName=NULL) {
+YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQTSUsername="gtdelapl", AQTSPassword="WQ*2021!", dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/g_del/Desktop", specName=NULL) {
 
 #Use the code below to run the script outside of a function.
-AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS"
-AQTSUsername="gtdelapl"
-AQTSPassword="WQ*2021!"
-dateRange="all"
-timeRange=c("00:00:00", "23:59:59")
-AQID="YOWN-1907"
-timeSeriesID="Wlevel_btoc.Calculated"
-chartXInterval="1 year"
-chartType="Level"
-saveTo="C:/Users/gtdelapl/Desktop"
-specName=NULL
+# AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS"
+# AQTSUsername="gtdelapl"
+# AQTSPassword="WQ*2021!"
+# dateRange="all"
+# timeRange=c("00:00:00", "23:59:59")
+# AQID="YOWN-1907"
+# timeSeriesID="Wlevel_btoc.Calculated"
+# chartXInterval="1 year"
+# chartType="Level"
+# saveTo="C:/Users/g_del/Desktop"
+# specName=NULL
 
   # Aquarius Connection configuration, if statement to either download all or part of the time-series.
   if (dateRange[1]=="all"){
@@ -242,8 +242,8 @@ specName=NULL
 
 
   # Final output and aesthetics
-  data(Logo)
-  data(Water)
+  utils::data(Logo)
+  utils::data(Water)
   finalplot <- cowplot::ggdraw(plot) +
     cowplot::draw_image(Logo, scale=0.16, vjust=-0.42, halign=-0.02) +
     cowplot::draw_image(Water, scale=0.18, vjust=-0.4, halign=1)
