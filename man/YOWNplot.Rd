@@ -6,8 +6,7 @@
 \usage{
 YOWNplot(
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS",
-  AQTSUsername = "gtdelapl",
-  AQTSPassword = "WQ*2021!",
+  AQlogin = Sys.getenv(c("AQUSER", "AQPASS"), names = FALSE),
   dateRange = "all",
   timeRange = c("00:00:00", "23:59:59"),
   AQID = "YOWN-1907",
@@ -21,9 +20,7 @@ YOWNplot(
 \arguments{
 \item{AQTSServerID}{The web address of your Aquarius server.}
 
-\item{AQTSUsername}{The Aquarius username you wish to use.}
-
-\item{AQTSPassword}{The password associated with the username.}
+\item{AQlogin}{The login parameters for Aquarius. Defaults to your .Renviron profile, in which the username and password should appear in key pairs of AQUSER="username" and AQPASS="password". You can also specify credentials in format c("username", "password").}
 
 \item{dateRange}{The date range your wish to graph for. Use "all" for the entirety of the time-series (1950-01-01 to today) or specify two dates as such: c("2000-01-01", "2021-01-01")}
 

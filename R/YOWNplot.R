@@ -5,18 +5,14 @@
 #TODO: add package names as package::function in the entire code to work as a function.
 
 
-library(plyr)
 library(data.table)
-library(ggplot2)
-library(cowplot)
 
 #' Graphing utility for YOWN wells
 #'
 #' Create standardized graphs for YOWN wells from data hosted on the Aquarius server. Each graph contains information specific to the site and the time-series requested, and is complemented by the YG and water logos in the upper corners. Saves the graph to the path specified by the user.
 #'
 #' @param AQTSServerID The web address of your Aquarius server.
-#' @param AQTSUsername The Aquarius username you wish to use.
-#' @param AQTSPassword The password associated with the username.
+#' @param AQlogin The login parameters for Aquarius. Defaults to your .Renviron profile, in which the username and password should appear in key pairs of AQUSER="username" and AQPASS="password". You can also specify credentials in format c("username", "password").
 #' @param dateRange The date range your wish to graph for. Use "all" for the entirety of the time-series (1950-01-01 to today) or specify two dates as such: c("2000-01-01", "2021-01-01")
 #' @param timeRange Defaults to the entire day. Set in the same manner as dateRange with hh:mm:ss format if you wish to plot only a portion of a day; in that case dateRange should have two identical dates.
 #' @param AQID The Aquarius ID of the site you wish to graph.
@@ -37,29 +33,26 @@ library(cowplot)
 #TODO: Cole, check and make sure that the default for saveTo is correct. The script automatically creates a folder specific for each AQID (so YOWN-xxx) if it does not yet exist.
 #TODO: Cole, let's make sure that the default behavior of overwriting a file if generated for the same site, TS type, and on the same day is desirable. This would happen unless specName is specified.
 
-#YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQTSUsername, AQTSPassword, dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID, timeSeriesID="Wlevel_btoc.Calculated", chartXInterval="1 year", chartType="Level", saveTo="//envgeoserver/share/WaterResources/Groundwater/YOWN_WL_CHART_OUTPUTS", specName=NULL) {
 
 #Use the code below to run the function with everything preset, by calling YOWNplot().
-YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQTSUsername="gtdelapl", AQTSPassword="WQ*2021!", dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/g_del/Desktop", specName=NULL) {
+YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQlogin=Sys.getenv(c("AQUSER", "AQPASS"), names=FALSE), dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/g_del/Desktop", specName=NULL) {
 
 #Use the code below to run the script outside of a function.
-# AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS"
-# AQTSUsername="gtdelapl"
-# AQTSPassword="WQ*2021!"
-# dateRange="all"
-# timeRange=c("00:00:00", "23:59:59")
-# AQID="YOWN-1907"
-# timeSeriesID="Wlevel_btoc.Calculated"
-# chartXInterval="1 year"
-# chartType="Level"
-# saveTo="C:/Users/g_del/Desktop"
-# specName=NULL
+AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS"
+dateRange="all"
+timeRange=c("00:00:00", "23:59:59")
+AQID="YOWN-1907"
+timeSeriesID="Wlevel_btoc.Calculated"
+chartXInterval="1 year"
+chartType="Level"
+saveTo="C:/Users/gtdelapl/Desktop"
+specName=NULL
 
   # Aquarius Connection configuration, if statement to either download all or part of the time-series.
   if (dateRange[1]=="all"){
     config = list(
       # Aquarius server credentials
-      server = AQTSServerID, username = AQTSUsername, password = AQTSPassword,
+      server = AQTSServerID, username = AQlogin[1], password = AQlogin[2],
       # time series name@location EX: Wlevel_btoc.Calculated@YOWN-XXXX
       timeSeriesName = paste0(timeSeriesID,"@",AQID),
       # Analysis time period
@@ -73,7 +66,7 @@ YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS
   if (((dateRange[1]=="all")==FALSE & (length(dateRange)==2))==TRUE) {
     config = list(
       # Aquarius server credentials
-      server = AQTSServerID, username = AQTSUsername, password = AQTSPassword,
+      server = AQTSServerID, username = AQlogin[1], password = AQlogin[2],
       # time series name@location EX: Wlevel_btoc.Calculated@YOWN-XXXX
       timeSeriesName = paste0(timeSeriesID,"@", AQID),
       # Analysis time period
