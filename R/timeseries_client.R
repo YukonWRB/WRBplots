@@ -2,9 +2,6 @@
 require(jsonlite)
 require(httr)
 
-# Sys.setenv(http_proxy="http://localhost:8888") # Enables Fiddler capturing of traffic
-# Sys.setenv(http_proxy="") # Disables Fiddler proxying
-
 # Create a simple AQUARIUS Time-Series API client.
 timeseriesClient <- setRefClass("timeseriesClient",
   fields = list(

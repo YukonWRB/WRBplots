@@ -37,18 +37,7 @@ library(data.table)
 #Use the code below to run the function with everything preset, by calling YOWNplot().
 YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQlogin=Sys.getenv(c("AQUSER", "AQPASS"), names=FALSE), dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/g_del/Desktop", specName=NULL) {
 
-#Use the code below to run the script outside of a function.
-AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS"
-dateRange="all"
-timeRange=c("00:00:00", "23:59:59")
-AQID="YOWN-1907"
-timeSeriesID="Wlevel_btoc.Calculated"
-chartXInterval="1 year"
-chartType="Level"
-saveTo="C:/Users/gtdelapl/Desktop"
-specName=NULL
-
-  # Aquarius Connection configuration, if statement to either download all or part of the time-series.
+  # Aquarius Connection configuration, if statement to either download all or part of the time-series
   if (dateRange[1]=="all"){
     config = list(
       # Aquarius server credentials
