@@ -1,25 +1,34 @@
-# Code by Cole Fischer, Groundwater Technologist, YG-ENV-WRB-GW-OPS. Adapted by Ghislain de Laplante, Climate Change and Water Data Scientist, to work as a function without magick package.
+# Code by Cole Fischer, Groundwater Technologist, YG-ENV-WRB-GW-OPS. Adapted by Ghislain de Laplante, Climate Change and Water Data Scientist, to work as a function of a package without magick package.
 # Aquarius code package (dependency) by Touraj Farahmand 2017-10-01
 
-#TODO: check and remove packages below that are not necessary.
 #TODO: add package names as package::function in the entire code to work as a function.
-
-
+#TODO: get the data in /inst and change references in code
+#TODO: remove data.table once it's in the code below
 library(data.table)
+library(ggplot2)
 
 #' Graphing utility for YOWN wells
 #'
 #' Create standardized graphs for YOWN wells from data hosted on the Aquarius server. Each graph contains information specific to the site and the time-series requested, and is complemented by the YG and water logos in the upper corners. Saves the graph to the path specified by the user.
 #'
 #' @param AQTSServerID The web address of your Aquarius server.
+#'
 #' @param AQlogin The login parameters for Aquarius. Defaults to your .Renviron profile, in which the username and password should appear in key pairs of AQUSER="username" and AQPASS="password". You can also specify credentials in format c("username", "password").
+#'
 #' @param dateRange The date range your wish to graph for. Use "all" for the entirety of the time-series (1950-01-01 to today) or specify two dates as such: c("2000-01-01", "2021-01-01")
+#'
 #' @param timeRange Defaults to the entire day. Set in the same manner as dateRange with hh:mm:ss format if you wish to plot only a portion of a day; in that case dateRange should have two identical dates.
-#' @param AQID The Aquarius ID of the site you wish to graph.
+#'
+#' @param AQID The Aquarius ID of the site you wish to graph, matching exactly how it is written in Aquarius (case sensitive)
+#'
 #' @param timeSeriesID The time-series you wish to graph, matching exactly how it is written in Aquarius (case sensitive).
+#'
 #' @param chartXInterval The x-axis interval markings, specified as per scales::date_breaks
+#'
 #' @param chartType The type of chart. Currently supporting only "Level", "SpC", "Temperature".
-#'@param saveTo The directory where you wish to save your graph. Will create a folder with the AQID if it does not yet exist and saves the image as a .png with a name composed of the chartType, AQID and the current date.
+#'
+#' @param saveTo The directory where you wish to save your graph. Will create a folder with the AQID if it does not yet exist and saves the image as a .png with a name composed of the chartType, AQID and the current date.
+#'
 #' @param specName Specify a file name here only if you wish to override the default naming of AQID and the current date; file name will still start with chartType. You should modify the NULL default if generating two graphs that will be named identically (same CharType, AQID, and date but different )
 #'
 #' @return A .png image of the time series with Yukon logos, saved to the directory specified in saveTo.
@@ -35,7 +44,13 @@ library(data.table)
 
 
 #Use the code below to run the function with everything preset, by calling YOWNplot().
-YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQlogin=Sys.getenv(c("AQUSER", "AQPASS"), names=FALSE), dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID="YOWN-1907", timeSeriesID="Water Temp.TEMPERATURE", chartXInterval="1 year", chartType="Temperature", saveTo="C:/Users/g_del/Desktop", specName=NULL) {
+YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS", AQlogin=Sys.getenv(c("AQUSER", "AQPASS"), names=FALSE), dateRange="all", timeRange=c("00:00:00", "23:59:59"), AQID, timeSeriesID, chartXInterval="1 year", chartType="Level", saveTo="choose", specName=NULL) {
+
+  #Set the save path
+  if (saveTo == "choose") {
+    print("Select the path to the folder where you want this report saved.")
+    saveTo <- as.character(utils::choose.dir(caption="Select Save Folder"))
+  }
 
   # Aquarius Connection configuration, if statement to either download all or part of the time-series
   if (dateRange[1]=="all"){
@@ -165,8 +180,8 @@ YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS
 
 
   if (chartType == "SpC") {
-    plot <- ggplot2::ggplot(fullplotdata[NAadd,], aes(x = timestamp, y = value))+
-      geom_line(data = fullplotdata[NAadd,],
+    plot <- ggplot2::ggplot(fullplotdata[NAadd,], ggplot2::aes(x = timestamp, y = value))+
+      ggplot2::geom_line(data = fullplotdata[NAadd,],
                 na.rm = TRUE,
                 aes(x = timestamp, y = value),
                 colour = "darkblue") +
