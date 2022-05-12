@@ -250,10 +250,10 @@ YOWNplot <- function(AQTSServerID="https://yukon.aquaticinformatics.net/AQUARIUS
   dir.create(paste0(saveTo,"/", AQID)) #create the directory if it doesn't exist
 
   if (is.null(specName)==TRUE){
-    ggplot2::ggsave(filename=paste0(saveTo,"/", AQID, "/", chartType, "_", AQID, "_", Sys.Date(), ".png"), plot=finalplot, height=8, width=12, units="in", device="png")
+    ggplot2::ggsave(filename=paste0(saveTo,"/", AQID, "/", chartType, "_", AQID, "_", Sys.Date(), ".png"), plot=finalplot, height=8, width=12, units="in", device="png", dpi=500)
   }
   if (is.null(specName)!=TRUE){
-    ggplot2::ggsave(filename=paste0(saveTo,"/", AQID, "/", chartType, "_", specName, ".png"), plot=finalplot, height=8, width=12, units="in",device="png")
+    ggplot2::ggsave(filename=paste0(saveTo,"/", AQID, "/", chartType, "_", specName, ".png"), plot=finalplot, height=8, width=12, units="in",device="png", dpi=500)
   }
 
 }
