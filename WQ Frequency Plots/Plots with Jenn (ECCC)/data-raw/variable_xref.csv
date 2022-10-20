@@ -1,0 +1,156 @@
+Variable_Group,VariableName,MetalName,Form
+Carbon,Carbon Dissolved Inorganic,,
+Carbon,Carbon Dissolved Organic,,
+Carbon,Carbon Total Inorganic,,
+Carbon,Carbon Total Organic,,
+Metals - Extractable,Barium Extractable,Barium, Extractable
+Metals - Extractable,Beryllium Extractable,Beryllium, Extractable
+Metals - Extractable,Boron Extractable,Boron, Extractable
+Metals - Extractable,Cadmium Extractable,Cadmium, Extractable
+Metals - Extractable,Calcium  extractable/unfiltered,Calcium, Extractable
+Metals - Extractable,Chromium Extractable,Chromium, Extractable
+Metals - Extractable,Cobalt Extractable,Cobalt, Extractable
+Metals - Extractable,Copper Extractable,Copper, Extractable
+Metals - Extractable,Gallium Extractable,Gallium, Extractable
+Metals - Extractable,Lanthanum Extractable,Lanthanum, Extractable
+Metals - Extractable,Lead Extractable,Lead, Extractable
+Metals - Extractable,Lithium Extractable,Lithium, Extractable
+Metals - Extractable,Magnesium extractable/unfiltered,Magnesium, Extractable
+Metals - Extractable,Manganese Extractable,Manganese, Extractable
+Metals - Extractable,Nickel Extractable,Nickel, Extractable
+Metals - Extractable,Potassium Extractable,Potassium, Extractable
+Metals - Extractable,Rubidium Extractable,Rubidium, Extractable
+Metals - Extractable,Selenium Extractable,Selenium, Extractable
+Metals - Extractable,Silicon Extractable,Silicon, Extractable
+Metals - Extractable,Silver Extractable,Silver, Extractable
+Metals - Extractable,Sodium Extractable,Sodium, Extractable
+Metals - Extractable,Strontium Extractable,Strontium, Extractable
+Metals - Extractable,Thallium Extractable,Thallium, Extractable
+Metals - Extractable,Uranium Extractable,Uranium, Extractable
+Metals - Extractable,Vanadium Extractable,Vanadium, Extractable
+Metals - Extractable,Zinc Extractable,Zinc, Extractable
+General,Alkalinity Total CaCO3,,
+General,Colour Apparent,,
+General,Colour True,,
+General,Hardness total,,
+General,pH,,
+General,Residue Filterable,,
+General,Residue Fixed Filterable,,
+General,Residue fixed nonfilterable,,
+General,Residue nonfilterable,,
+General,Specific Conductance,,
+General,Temperature (air),,
+General,Temperature (water),,
+General,Turbidity,,
+Major Ions & Other Inorganics,Bromide Dissolved,,
+Major Ions & Other Inorganics,Calcium Dissolved,,
+Major Ions & Other Inorganics,Chloride Dissolved,,
+Major Ions & Other Inorganics,Fluoride Dissolved,,
+Major Ions & Other Inorganics,Fluoride total,,
+Major Ions & Other Inorganics,Magnesium Dissolved,,
+Major Ions & Other Inorganics,Potassium dissolved/filtered,,
+Major Ions & Other Inorganics,Silica Dissolved,,
+Major Ions & Other Inorganics,Silicon Dissolved,,
+Major Ions & Other Inorganics,Sodium dissolved/filtered,,
+Major Ions & Other Inorganics,Sulphate Dissolved,,
+Nutrients,Dissolved nitrite/nitrate,,
+Nutrients,Dissolved nitrogen nitrate,,
+Nutrients,Nitrogen Nitrite,,
+Nutrients,Nitrogen Total,,
+Nutrients,Nitrogen Total Dissolved,,
+Nutrients,Orthophosphate dissolved,,
+Nutrients,Phosphorus Total Dissolved,,
+Metals - Total,Aluminum Total,Aluminum, Total
+Metals - Total,Antimony Total,Antimony, Total
+Metals - Total,Arsenic Total,Arsenic, Total
+Metals - Total,Barium Total,Barium, Total
+Metals - Total,Beryllium Total,Beryllium, Total
+Metals - Total,Bismuth Total,Bismuth, Total
+Metals - Total,Boron Total,Boron, Total
+Metals - Total,Cadmium Total,Cadmium, Total
+Metals - Total,Cerium Total,Cerium, Total
+Metals - Total,Cesium Total,Cesium, Total
+Metals - Total,Chromium Total,Chromium, Total
+Metals - Total,Cobalt Total,Cobalt, Total
+Metals - Total,Copper Total,Copper, Total
+Metals - Total,Gallium Total,Gallium, Total
+Metals - Total,Indium Total,Indium, Total
+Metals - Total,Iron Total,Iron, Total
+Metals - Total,Lanthanum Total,Lanthanum, Total
+Metals - Total,Lead Total,Lead, Total
+Metals - Total,Lithium Total,Lithium, Total
+Metals - Total,Manganese Total,Manganese, Total
+Metals - Total,Molybdenum Total,Molybdenum, Total
+Metals - Total,Nickel Total,Nickel, Total
+Metals - Total,Niobium Total,Niobium, Total
+Metals - Total,Palladium Total,Palladium, Total
+Metals - Total,Phosphorus Total,Phosphorus, Total
+Metals - Total,Platinum Total,Platinum, Total
+Metals - Total,Rubidium Total,Rubidium, Total
+Metals - Total,Scandium Total,Scandium, Total
+Metals - Total,Selenium Total,Selenium, Total
+Metals - Total,Silver Total,Silver, Total
+Metals - Total,Strontium Total,Strontium, Total
+Metals - Total,Tellurium Total,Tellurium, Total
+Metals - Total,Thallium Total,Thallium, Total
+Metals - Total,Tin Total,Tin, Total
+Metals - Total,Titanium Total,Titanium, Total
+Metals - Total,Tungsten Total,Tungsten, Total
+Metals - Total,Uranium Total,Uranium, Total
+Metals - Total,Vanadium Total,Vanadium, Total
+Metals - Total,Yttrium Total,Yttrium, Total
+Metals - Total,Zinc Total,Zinc, Total
+Metals - Total,Zirconium Total,Zirconium, Total
+Metals - Dissolved,Aluminum Dissolved,Aluminum, Dissolved
+Metals - Dissolved,Aluminum Extractable,Aluminum, Dissolved
+Metals - Dissolved,Ammonia Dissolved,Ammonia, Dissolved
+Metals - Dissolved,Antimony Dissolved,Antimony, Dissolved
+Metals - Dissolved,Antimony Extractable,Antimony, Dissolved
+Metals - Dissolved,Arsenic Dissolved,Arsenic, Dissolved
+Metals - Dissolved,Arsenic Extractable,Arsenic, Dissolved
+Metals - Dissolved,Barium Dissolved,Barium, Dissolved
+Metals - Dissolved,Beryllium Dissolved,Beryllium, Dissolved
+Metals - Dissolved,Bismuth Dissolved,Bismuth, Dissolved
+Metals - Dissolved,Bismuth Extractable,Bismuth, Dissolved
+Metals - Dissolved,Boron Dissolved,Boron, Dissolved
+Metals - Dissolved,Cadmium Dissolved,Cadmium, Dissolved
+Metals - Dissolved,Cerium Dissolved,Cerium, Dissolved
+Metals - Dissolved,Cesium Dissolved,Cesium, Dissolved
+Metals - Dissolved,Chromium Dissolved,Chromium, Dissolved
+Metals - Dissolved,Cobalt Dissolved,Cobalt, Dissolved
+General,Conductance (field),,
+Metals - Dissolved,Copper Dissolved,Copper, Dissolved
+Other,Cyanide Total,,
+Other,Cyanide weak acid dissociable,,
+Biota,Fecal coliforms,,
+Metals - Dissolved,Gallium Dissolved,Gallium, Dissolved
+General,Hardness Total CaCO3,,
+Metals - Dissolved,Iron Dissolved,Iron, Dissolved
+Metals - Extractable,Iron Extractable,Iron, Extractable
+Metals - Dissolved,Lanthanum Dissolved,Lanthanum, Dissolved
+Metals - Dissolved,Lead Dissolved,Lead, Dissolved
+Metals - Dissolved,Lithium Dissolved,Lithium, Dissolved
+Major Ions & Other Inorganics,Magnesium Dissolved (Calcd.),,
+Metals - Dissolved,Manganese Dissolved,Manganese, Dissolved
+Metals - Dissolved,Molybdenum Dissolved,Molybdenum, Dissolved
+Metals - Extractable,Molybdenum Extractable,Molybdenum, Extractable
+Metals - Dissolved,Nickel Dissolved,Nickel, Dissolved
+Metals - Dissolved,Niobium Dissolved,Niobium, Dissolved
+Metals - Extractable,Niobium Extractable,Niobium, Extractable
+Nutrients,Orthophosphorus dissolved,,
+General,Oxygen Dissolved,,
+Metals - Dissolved,Platinum Dissolved,Platinum, Dissolved
+Metals - Dissolved,Rubidium Dissolved,Rubidium, Dissolved
+Metals - Dissolved,Selenium Dissolved,Selenium, Dissolved
+Major Ions & Other Inorganics,Silica Reactive,,
+Metals - Dissolved,Silver Dissolved,Silver, Dissolved
+Metals - Dissolved,Strontium Dissolved,Strontium, Dissolved
+Metals - Dissolved,Thallium Dissolved,Thallium, Dissolved
+Metals - Dissolved,Tin Dissolved,Tin, Dissolved
+Metals - Dissolved,Titanium Dissolved,Titanium, Dissolved
+Metals - Dissolved,Tungsten Dissolved,Tungsten, Dissolved
+Metals - Dissolved,Uranium Dissolved,Uranium, Dissolved
+Metals - Dissolved,Vanadium Dissolved,Vanadium, Dissolved
+Metals - Dissolved,Yttrium Dissolved,Yttrium, Dissolved
+Metals - Dissolved,Zinc Dissolved,Zinc, Dissolved
+Metals - Dissolved,Zirconium Dissolved,Zirconium, Dissolved
