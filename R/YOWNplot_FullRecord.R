@@ -17,7 +17,7 @@
 YOWNplot_FullRecord <- function(AQID,
                                 timeSeriesID="Wlevel_bgs.Calculated",
                                 chartXInterval ="1 year",
-                                saveTo = "\\\\envgeoserver\\share\\WaterResources\\Groundwater\\YOWN_DATA",
+                                saveTo = "desktop",
                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                                 login = Sys.getenv(c("AQUSER", "AQPASS")))
 {
@@ -25,10 +25,16 @@ YOWNplot_FullRecord <- function(AQID,
   # AQID = "YOWN-1925"
   # timeSeriesID="Wlevel_bgs.Calculated"
   # chartXInterval ="1 year"
-  # saveTo = saveTo = "\\\\envgeoserver\\share\\WaterResources\\Groundwater\\YOWN_DATA\\"
+  # saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
   # login = Sys.getenv(c("AQUSER", "AQPASS"))
   # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
-  # login = Sys.getenv(c("AQUSER", "AQPASS")))
+
+  if(tolower(saveTo) == "desktop") {
+    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
+  }
+if(dir.exists(saveTo) == FALSE) {
+  stop("Specified directory does not exist")
+}
 
   print(AQID)
 
@@ -169,20 +175,20 @@ YOWNplot_FullRecord <- function(AQID,
 
   # Add final aesthetic tweaks, print plot onto template
   final_plot <- cowplot::ggdraw() +
-    cowplot::draw_image("G:\\water\\Groundwater\\2_YUKON_OBSERVATION_WELL_NETWORK\\4_YOWN_DATA_ANALYSIS\\1_WATER LEVEL\\00_AUTOMATED_REPORTING\\01_MARKUP_IMAGES\\template_grades.jpg") +
+    cowplot::draw_image("G:/water/Groundwater/2_YUKON_OBSERVATION_WELL_NETWORK/4_YOWN_DATA_ANALYSIS/1_WATER LEVEL/00_AUTOMATED_REPORTING/01_MARKUP_IMAGES/template_grades.jpg") +
     cowplot::draw_plot(final)
 
-  dir.create(paste0(saveTo, AQID), showWarnings = FALSE)
-  ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "\\", AQID, "\\", AQID, "_FullRecord", ".pdf"),  height = 8.5, width = 11, units = "in")
+  dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
+  ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", ".pdf"),  height = 8.5, width = 11, units = "in")
 
   print("Full Record plot Generated")
 
   # Prepare and write time series and grading csv exports
   write.csv(x = timeseries,
-            file = paste0(saveTo, "\\", AQID, "\\", AQID, "_FullRecord", ".csv"))
+            file = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", ".csv"))
 
-  file.copy(from = "G:\\water\\Groundwater\\2_YUKON_OBSERVATION_WELL_NETWORK\\4_YOWN_DATA_ANALYSIS\\1_WATER LEVEL\\00_AUTOMATED_REPORTING\\02_R_SUPPORT_FILES\\YOWN_GradeKey.txt",
-            to = paste0(saveTo, "\\", AQID, "\\", AQID, "_FullRecord", "YOWN_GradeKey.txt"),
+  file.copy(from = "G:/water/Groundwater/2_YUKON_OBSERVATION_WELL_NETWORK/4_YOWN_DATA_ANALYSIS/1_WATER LEVEL/00_AUTOMATED_REPORTING/02_R_SUPPORT_FILES/YOWN_GradeKey.txt",
+            to = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", "YOWN_GradeKey.txt"),
             overwrite = TRUE)
 
   print(paste0("Grade key, and data .csv written to", saveTo))
