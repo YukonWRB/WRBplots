@@ -1,29 +1,37 @@
 Package: WRBplots
 Title: Make pretty, standard plots for a variety of WRB uses
-Version: 0.0.0.9000
+Version: 1.0.0.0
 Authors@R: 
     person("Ghislain", "de Laplante", , "ghislain.delaplante@yukon.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5093-9185"))
-Description: Functions that facilitate the generation of custom plots from data downloaded from Aquarius.
+Description: Functions that facilitate the generation of custom plots from
+    data downloaded from Aquarius.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
-Imports: 
-   ggplot2, 
-   plyr, 
-   dplyr, 
-   grid, 
-   cowplot, 
-   data.table, 
-   methods, 
-   magrittr, utils, magick
-Suggests: 
-    rmarkdown,
-    knitr,
-    testthat (>= 3.0.0)
-VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
-LazyData: true
+Imports: 
+    cowplot,
+    data.table,
+    dplyr,
+    ggnewscale,
+    ggplot2,
+    grid,
+    magick,
+    magrittr,
+    methods,
+    plyr,
+    utils,
+    WRBtools
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Remotes:
+    github::YukonWRB/WRBtools
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2
