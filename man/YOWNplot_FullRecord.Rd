@@ -8,8 +8,7 @@ YOWNplot_FullRecord(
   AQID,
   timeSeriesID = "Wlevel_bgs.Calculated",
   chartXInterval = "1 year",
-  saveTo =
-    "\\\\\\\\envgeoserver\\\\share\\\\WaterResources\\\\Groundwater\\\\YOWN_DATA\\\\",
+  saveTo = "desktop",
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS",
   login = Sys.getenv(c("AQUSER", "AQPASS"))
 )
