@@ -75,7 +75,7 @@ if(dir.exists(saveTo) == FALSE) {
 
     # Merge all listed gap data frames, combine with original timeseries, order and format. I fno gaps proceed with base timeseries
     gapmerge <- do.call(rbind, gaplist)
-    plotdf <- dplyr::full_join(timeseries, gapmerge)
+    plotdf <- suppressMessages(dplyr::full_join(timeseries, gapmerge))
   } else {
     plotdf <- timeseries
   }
@@ -191,7 +191,7 @@ if(dir.exists(saveTo) == FALSE) {
             to = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", "YOWN_GradeKey.txt"),
             overwrite = TRUE)
 
-  print(paste0("Grade key, and data .csv written to", saveTo))
+  print(paste0("Grade key, and data .csv written to ", saveTo))
   return(final)
 }
 
