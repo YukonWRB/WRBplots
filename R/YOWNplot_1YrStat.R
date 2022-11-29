@@ -1,6 +1,6 @@
 #' YOWN 1-Year Stat Plot Generation Function
 #'
-#' This function checks length of YOWN site, if greater than 2 years calculates and plots most recent year's level data and historical statistics. If period of record is shorter than 2 years, prints most recent year of level data only.
+#' This function checks length of YOWN site record, if greater than 2 years calculates and plots most recent year's level data and historical statistics. If period of record is shorter than 2 years, outputs most recent year of level data only.
 #'
 #' To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 #'
@@ -11,17 +11,23 @@
 #' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
 #'
 #'
-#' @return Plot of most recent year's groundwater level, with calculated historical statistics if applicable.
+#' @return Writes .pdf of a 1 year water level plot for a YOWN site
 #'
 #' @export
 #'
-#' @examples
 YOWNStatPlot1Yr <- function(AQID,
                             timeSeriesID = "Wlevel_bgs.Calculated",
                             saveTo = "desktop",
                             AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                             login = Sys.getenv(c("AQUSER", "AQPASS")))
   {
+
+  # AQID = "YOWN-1925"
+  # timeSeriesID="Wlevel_bgs.Calculated"
+  # chartXInterval ="1 year"
+  # saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")

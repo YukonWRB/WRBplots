@@ -1,13 +1,13 @@
-#' Full Record Plot Generation for YOWN Sites
+#' YOWN Full Record Plot Generation
 #'
-#' This function downloads YOWN level data from Aquarius, screens data graded below "C", writes the csv file contaiing the entire period of record, and copies the grading key from the master location to the SaveTo directory
+#' This function downloads YOWN level data from Aquarius, screens data graded below "C", writes the csv file containing the entire period of record, and copies the grading key from the master location to the SaveTo directory
 #'
-#' To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
+#' To store login credentials in your .renviron profile, run usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 #'
 #' @param AQID Identity of YOWN site in the following format: "YOWN-XXXX" or "YOWN-XXXXD"
 #' @param timeSeriesID Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")
 #' @param chartXInterval Interval for the chart X axis, written in text format (eg. "1 month", "1 year")
-#' @param saveTo Location for data files to be saved. Will create directory if it doesn't exist
+#' @param saveTo Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.
 #' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
 #' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
 #'
@@ -111,7 +111,7 @@ if(dir.exists(saveTo) == FALSE) {
     ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
                    panel.border = ggplot2::element_rect(color = "grey",
                                                         fill = NULL,
-                                                        size = 0.5),
+                                                        linewidth = 0.5),
                    axis.text.x = ggplot2::element_text(angle = 0,
                                                        hjust  = 0.5,
                                                        vjust = -0.5,
@@ -123,7 +123,7 @@ if(dir.exists(saveTo) == FALSE) {
                                                         size = 12,
                                                         colour = "#464646"),
                    axis.line.y.left = ggplot2::element_blank(),
-                   panel.grid.major = ggplot2::element_line(colour = "lightgrey", size = 0.5, linetype = 1),
+                   panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
                    legend.position = "bottom",
                    legend.justification = "left",
                    legend.margin = ggplot2::margin(0,0,0,0),
