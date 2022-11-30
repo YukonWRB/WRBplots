@@ -3,4 +3,5 @@
 export("%>%")
 export(YOWNplot_1YrStat)
 export(YOWNplot_FullRecord)
+export(YOWNplot_WSC)
 importFrom(magrittr,"%>%")
