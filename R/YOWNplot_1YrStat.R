@@ -6,7 +6,7 @@
 #'
 #' @param AQID Identity of YOWN site in the following format: "YOWN-XXXX" or "YOWN-XXXXD"
 #' @param timeSeriesID Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")
-#' @param saveTo Location for data files to be saved. Default is creation of a new folder on your desktop.
+#' @param saveTo Location for data files to be saved. Default is publication to a new folder on your desktop.
 #' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
 #' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
 #'
@@ -15,7 +15,7 @@
 #'
 #' @export
 #'
-YOWNStatPlot1Yr <- function(AQID,
+YOWNplot_1YrStat <- function(AQID,
                             timeSeriesID = "Wlevel_bgs.Calculated",
                             saveTo = "desktop",
                             AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
@@ -98,7 +98,7 @@ YOWNStatPlot1Yr <- function(AQID,
     dayrange <- na.omit(dayrange)
 
     # Join statistics to plot data
-    fulldf <-dplyr::full_join(fulldf, dayrange)
+    fulldf <-suppressMessages(dplyr::full_join(fulldf, dayrange))
     print("Statistics calculated")
 
     # Subset 1 year of most recent data data, based on date of last site visit

@@ -2,7 +2,7 @@
 % Please edit documentation in R/YOWNplot_FullRecord.R
 \name{YOWNplot_FullRecord}
 \alias{YOWNplot_FullRecord}
-\title{Full Record Plot Generation for YOWN Sites}
+\title{YOWN Full Record Plot Generation}
 \usage{
 YOWNplot_FullRecord(
   AQID,
@@ -20,7 +20,7 @@ YOWNplot_FullRecord(
 
 \item{chartXInterval}{Interval for the chart X axis, written in text format (eg. "1 month", "1 year")}
 
-\item{saveTo}{Location for data files to be saved. Will create directory if it doesn't exist}
+\item{saveTo}{Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.}
 
 \item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
 
@@ -30,8 +30,8 @@ YOWNplot_FullRecord(
 Writes .pdf of the full period of record for a specified YOWN site and time series ID, as well as a .csv containing all the raw data and copies a grade key to interpret data grading
 }
 \description{
-This function downloads YOWN level data from Aquarius, screens data graded below "C", writes the csv file contaiing the entire period of record, and copies the grading key from the master location to the SaveTo directory
+This function downloads YOWN level data from Aquarius, screens data graded below "C", writes the csv file containing the entire period of record, and copies the grading key from the master location to the SaveTo directory
 }
 \details{
-To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
+To store login credentials in your .renviron profile, run usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 }

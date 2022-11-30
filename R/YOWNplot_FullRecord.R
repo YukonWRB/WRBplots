@@ -22,12 +22,12 @@ YOWNplot_FullRecord <- function(AQID,
                                 login = Sys.getenv(c("AQUSER", "AQPASS")))
 {
 
-  # AQID = "YOWN-1925"
-  # timeSeriesID="Wlevel_bgs.Calculated"
-  # chartXInterval ="1 year"
-  # saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
-  # login = Sys.getenv(c("AQUSER", "AQPASS"))
-  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  AQID = "YOWN-1925"
+  timeSeriesID="Wlevel_bgs.Calculated"
+  chartXInterval ="1 year"
+  saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
@@ -40,8 +40,8 @@ if(dir.exists(saveTo) == FALSE) {
 
   # Download data from Aquarius
   timeRange = c("00:00:00", "23:59:59")
-  datalist <- WRBtools::aq_download(loc_id = AQID,
-                                    ts_name = "Wlevel_bgs.Calculated")
+  datalist <- suppressMessages(WRBtools::aq_download(loc_id = AQID,
+                                    ts_name = "Wlevel_bgs.Calculated"))
 
   # Unlist time series data
   timeseries <- datalist$timeseries
@@ -92,10 +92,19 @@ if(dir.exists(saveTo) == FALSE) {
       grade_description == "REDACTED" ~ "#DC4405",
       grade_description == "MISSING DATA" ~ "black"))
 
-  #Identify data gaps ("Value" column) of more than 6 hours, indicative of logger failure
+  #Identify data gaps ("Value" column) of more than 6 hours, indicative of logger failure, create true/false vector specifying which poiints to plot. THis prevents the geom_line from koining points if they are more than 6 hours apart
   NAcomp <- rle(!is.na(plotdf$value))
   NAcomp$values[which(NAcomp$lengths>6 & !NAcomp$values)] <- TRUE
   NAadd <- inverse.rle(NAcomp)
+
+  # Check and format chart x axis
+  diff <- as.numeric(difftime(max(plotdf$timestamp), min(plotdf$timestamp), units = "days"))
+  chartXInterval <- dplyr::case_when(
+    diff < 365 ~ "1 month",
+    diff <= 730 & diff < 1095 ~ "2 months",
+    diff > 1095 & diff < 2555 ~ "6 months",
+    diff > 2555 ~ "1 year"
+  )
 
   # Create plots, add aesthetic tweaks
   plot <- ggplot2::ggplot() +
