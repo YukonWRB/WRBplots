@@ -17,7 +17,7 @@ YOWNplot_1YrStat(
 
 \item{timeSeriesID}{Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")}
 
-\item{saveTo}{Location for data files to be saved. Default is creation of a new folder on your desktop.}
+\item{saveTo}{Location for data files to be saved. Default is publication to a new folder on your desktop.}
 
 \item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
 

@@ -18,7 +18,7 @@ YOWNplot_FullRecord(
 
 \item{timeSeriesID}{Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")}
 
-\item{chartXInterval}{Interval for the chart X axis, written in text format (eg. "1 month", "1 year")}
+\item{chartXInterval}{Interval for the chart X axis, written in text format (eg. "1 month", "1 year"). Automatically calculates if not specified.}
 
 \item{saveTo}{Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.}
 

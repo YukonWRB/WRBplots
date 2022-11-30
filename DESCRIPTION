@@ -1,9 +1,9 @@
 Package: WRBplots
 Title: Make pretty, standard plots for a variety of WRB uses
-Version: 1.0.0.0
+Version: 1.0.1-1
 Authors@R: 
-    person("Ghislain", "de Laplante", , "ghislain.delaplante@yukon.ca", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-5093-9185"))
+    person("Cole", "Fischer", , "cole.fischer@hotmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7266-5760"))
 Description: Functions that facilitate the generation of custom plots from
     data downloaded from Aquarius.
 License: MIT + file LICENSE

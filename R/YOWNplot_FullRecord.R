@@ -6,7 +6,7 @@
 #'
 #' @param AQID Identity of YOWN site in the following format: "YOWN-XXXX" or "YOWN-XXXXD"
 #' @param timeSeriesID Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")
-#' @param chartXInterval Interval for the chart X axis, written in text format (eg. "1 month", "1 year")
+#' @param chartXInterval Interval for the chart X axis, written in text format (eg. "1 month", "1 year"). Automatically calculates if not specified.
 #' @param saveTo Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.
 #' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
 #' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
@@ -22,12 +22,12 @@ YOWNplot_FullRecord <- function(AQID,
                                 login = Sys.getenv(c("AQUSER", "AQPASS")))
 {
 
-  AQID = "YOWN-1925"
-  timeSeriesID="Wlevel_bgs.Calculated"
-  chartXInterval ="1 year"
-  saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
-  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  # AQID = "YOWN-1706"
+  # timeSeriesID="Wlevel_bgs.Calculated"
+  # chartXInterval ="1 year"
+  # saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
@@ -35,8 +35,6 @@ YOWNplot_FullRecord <- function(AQID,
 if(dir.exists(saveTo) == FALSE) {
   stop("Specified directory does not exist")
 }
-
-  print(AQID)
 
   # Download data from Aquarius
   timeRange = c("00:00:00", "23:59:59")
@@ -101,9 +99,9 @@ if(dir.exists(saveTo) == FALSE) {
   diff <- as.numeric(difftime(max(plotdf$timestamp), min(plotdf$timestamp), units = "days"))
   chartXInterval <- dplyr::case_when(
     diff < 365 ~ "1 month",
-    diff <= 730 & diff < 1095 ~ "2 months",
-    diff > 1095 & diff < 2555 ~ "6 months",
-    diff > 2555 ~ "1 year"
+    diff >= 365 & diff < 730 ~ "2 months",
+    diff >= 730 & diff < 1460 ~ "6 months",
+    diff > 1460 ~ "1 year"
   )
 
   # Create plots, add aesthetic tweaks
@@ -121,9 +119,9 @@ if(dir.exists(saveTo) == FALSE) {
                    panel.border = ggplot2::element_rect(color = "grey",
                                                         fill = NULL,
                                                         linewidth = 0.5),
-                   axis.text.x = ggplot2::element_text(angle = 0,
-                                                       hjust  = 0.5,
-                                                       vjust = -0.5,
+                   axis.text.x = ggplot2::element_text(angle = 45,
+                                                       hjust  = 1,
+                                                       vjust = 1,
                                                        size = 10),
                    axis.line.x.bottom = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_text(hjust = 1,
@@ -141,7 +139,7 @@ if(dir.exists(saveTo) == FALSE) {
     ggplot2::scale_x_datetime(name = "",
                               limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
                               date_breaks = chartXInterval,
-                              date_labels = "%b-%y",
+                              date_labels = "%m-%Y",
                               expand = c(0, 0)) +
     ggplot2::scale_y_reverse(name = "Water Level (m below ground surface)",
                              limits = c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor)),
@@ -200,7 +198,7 @@ if(dir.exists(saveTo) == FALSE) {
             to = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", "YOWN_GradeKey.txt"),
             overwrite = TRUE)
 
-  print(paste0("Grade key, and data .csv written to ", saveTo))
+  print(paste0("Grade key, and data .csv written to ", saveTo, AQID))
   return(final)
 }
 

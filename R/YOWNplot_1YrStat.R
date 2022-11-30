@@ -22,12 +22,12 @@ YOWNplot_1YrStat <- function(AQID,
                             login = Sys.getenv(c("AQUSER", "AQPASS")))
   {
 
-  # AQID = "YOWN-1925"
-  # timeSeriesID="Wlevel_bgs.Calculated"
-  # chartXInterval ="1 year"
-  # saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
-  # login = Sys.getenv(c("AQUSER", "AQPASS"))
-  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+# AQID = "YOWN-1706"
+# timeSeriesID="Wlevel_bgs.Calculated"
+# chartXInterval ="1 year"
+# saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
+# login = Sys.getenv(c("AQUSER", "AQPASS"))
+# AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
@@ -38,8 +38,8 @@ YOWNplot_1YrStat <- function(AQID,
   print(AQID)
 
   # Download data from Aquarius
-  datalist <- WRBtools::aq_download(loc_id = AQID,
-                                    ts_name = "Wlevel_bgs.Calculated")
+  datalist <- suppressMessages(WRBtools::aq_download(loc_id = AQID,
+                                    ts_name = "Wlevel_bgs.Calculated"))
 
   # Unlist time series data
   timeseries <- datalist$timeseries
@@ -56,7 +56,7 @@ YOWNplot_1YrStat <- function(AQID,
 
   #Find data gaps of greater than 6 hours (indicative of logger failure) and generate NA data sets to fill in gaps
   timeseries$ts_lag <- dplyr::lag(timeseries$timestamp_MST)
-  timeseries$lag_val <- timeseries$timestamp_MST - timeseries$ts_lag
+  timeseries$lag_val <- difftime(timeseries$timestamp_MST, timeseries$ts_lag, units = "hours")
   gapdf <- timeseries %>%
     dplyr::filter(lag_val > 6)
   gapdf$lag_val <- as.numeric(gapdf$lag_val)
@@ -72,7 +72,7 @@ YOWNplot_1YrStat <- function(AQID,
 
     # Merge all listed gap data frames, combine with original timeseries, order and format
     gapmerge <- do.call(rbind, gaplist)
-    fulldf <- dplyr::full_join(timeseries, gapmerge)
+    fulldf <- suppressMessages(dplyr::full_join(timeseries, gapmerge))
     fulldf <- fulldf[order(fulldf$timestamp_MST),] # Order by timestamp
     fulldf <- fulldf[!duplicated(fulldf["timestamp_MST"]),] #Remove second entry for duplicated timestamps
   } else {
@@ -109,6 +109,13 @@ YOWNplot_1YrStat <- function(AQID,
     NAcomp$values[which(NAcomp$lengths>6 & !NAcomp$values)] <- TRUE
     NAadd <- inverse.rle(NAcomp)
 
+    diff <- as.numeric(difftime(max(plotdf$timestamp), min(plotdf$timestamp), units = "days"))
+    chartXInterval <- dplyr::case_when(
+      diff < 365 ~ "1 month",
+      diff >= 365 & diff < 730 ~ "2 months",
+      diff >= 730 & diff < 1460 ~ "6 months",
+      diff > 1460 ~ "1 year")
+
     # Create plots, add aesthetic tweaks
     plot <- ggplot2::ggplot() +
       ggplot2::geom_ribbon(data = plotdf,
@@ -129,11 +136,11 @@ YOWNplot_1YrStat <- function(AQID,
       ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
             panel.border = ggplot2::element_rect(color = "grey",
                                         fill = NULL,
-                                        size = 0.5),
-            axis.text.x = ggplot2::element_text(angle = 0,
-                                       hjust  = 0.5,
-                                       vjust = -0.5,
-                                       size = 10),
+                                        linewidth = 0.5),
+            axis.text.x = ggplot2::element_text(angle = 45,
+                                                hjust  = 1,
+                                                vjust = 1,
+                                                size = 10),
             axis.line.x.bottom = ggplot2::element_blank(),
             axis.text.y = ggplot2::element_text(hjust = 1,
                                        size = 10),
@@ -141,7 +148,7 @@ YOWNplot_1YrStat <- function(AQID,
                                         size = 12,
                                         colour = "#464646"),
             axis.line.y.left = ggplot2::element_blank(),
-            panel.grid.major = ggplot2::element_line(colour = "lightgrey", size = 0.5, linetype = 1),
+            panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
             legend.position = "bottom",
             legend.justification = "left",
             legend.margin = ggplot2::margin(0,0,0,0),
@@ -150,7 +157,7 @@ YOWNplot_1YrStat <- function(AQID,
       ggplot2::scale_x_datetime(name = "",
                        limits = c(max(plotdf$timestamp) - lubridate::years(1), max(plotdf$timestamp)),
                        date_breaks = "1 month",
-                       date_labels = "%b-%y",
+                       date_labels = "%m-%Y",
                        expand = c(0, 0)) +
       ggplot2::scale_y_reverse(name = "Water Level (m below ground surface)",
                       limits = c(plyr::round_any(max(na.omit(plotdf$max)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$min)), 0.25, f = floor)),
@@ -202,7 +209,7 @@ YOWNplot_1YrStat <- function(AQID,
       ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
             panel.border = ggplot2::element_rect(color = "grey",
                                         fill = NULL,
-                                        size = 0.5),
+                                        linewidth = 0.5),
             axis.text.x = ggplot2::element_text(angle = 0,
                                        hjust  = 0.5,
                                        vjust = -0.5,
@@ -214,7 +221,7 @@ YOWNplot_1YrStat <- function(AQID,
                                         size = 12,
                                         colour = "#464646"),
             axis.line.y.left = ggplot2::element_blank(),
-            panel.grid.major = ggplot2::element_line(colour = "lightgrey", size = 0.5, linetype = 1),
+            panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
             legend.position = "bottom",
             legend.justification = "left",
             legend.margin = ggplot2::margin(0,0,0,0),
@@ -275,7 +282,7 @@ YOWNplot_1YrStat <- function(AQID,
   dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
   ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "/", AQID, "/", AQID, "_1YrStatPlot", ".pdf"),  height = 8.5, width = 11, units = "in")
 
-  print(paste0("1 Year stat plot written to ", saveTo, "/", AQID))
+  print(paste0("1 Year stat plot written to ", saveTo, AQID))
   return(final)
 
 }
