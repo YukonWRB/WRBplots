@@ -25,7 +25,7 @@ YOWNplot_1YrStat <- function(AQID,
 # AQID = "YOWN-1706"
 # timeSeriesID="Wlevel_bgs.Calculated"
 # chartXInterval ="1 year"
-# saveTo = "//envgeoserver/share/WaterResources/Groundwater/YOWN_DATA/"
+# saveTo = "desktop"
 # login = Sys.getenv(c("AQUSER", "AQPASS"))
 # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
@@ -35,7 +35,6 @@ YOWNplot_1YrStat <- function(AQID,
   if(dir.exists(saveTo) == FALSE) {
     stop("Specified directory does not exist")
   }
-  print(AQID)
 
   # Download data from Aquarius
   datalist <- suppressMessages(WRBtools::aq_download(loc_id = AQID,
@@ -282,7 +281,7 @@ YOWNplot_1YrStat <- function(AQID,
   dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
   ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "/", AQID, "/", AQID, "_1YrStatPlot", ".pdf"),  height = 8.5, width = 11, units = "in")
 
-  print(paste0("1 Year stat plot written to ", saveTo, AQID))
+  print(paste0("1 Year stat plot written to ", saveTo, "/", AQID))
   return(final)
 
 }

@@ -15,18 +15,19 @@
 #' @return Writes .pdf plot of WSC and YOWN data
 #'
 #' @export
-YOWNplot_FullRecord <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205"),
+YOWNplot_SiteCompare <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205"),
                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                                 chartRange = "all",
                                 chartXInterval ="1 year",
-                                saveTo = "desktop") {
+                                saveTo = "desktop",
+                                login = Sys.getenv(c("AQUSER", "AQPASS"))) {
 
-  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
   index = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
   chartRange = "all"
-  timeSeriesID="Wlevel_bgs.Calculated"
   chartXInterval ="1 year"
   saveTo = "desktop"
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
@@ -37,8 +38,6 @@ YOWNplot_FullRecord <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-
 
   # Create index of desired YOWN stations for plotting
   index <- c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
-  chartXInterval ="1 month"
-  saveTo = "G:\\water\\Groundwater\\2_YUKON_OBSERVATION_WELL_NETWORK\\4_YOWN_DATA_ANALYSIS\\1_WATER LEVEL\\01_ARMY_BEACH\\"
 
   # Create a list of data frames for plotting
   sitelist <- list()
@@ -97,7 +96,8 @@ YOWNplot_FullRecord <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-
   # Combine list into one data frame, adjust df to size based on chartRange function param (TODO)
   plotdf <- do.call(rbind, sitelist)
   rownames(plotdf) <- NULL
-  # if(chartRange = "all")
+
+  if(chartRange = "all")
 
   # Plot data, format and export
   plot <- ggplot2::ggplot() +
@@ -179,3 +179,6 @@ YOWNplot_FullRecord <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-
   ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "SiteCompare.pdf"),  height = 8.5, width = 11, units = "in")
 
   print("Site Comparison Plot Generated")
+
+}
+
