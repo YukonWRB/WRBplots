@@ -14,18 +14,18 @@
 #' @export
 #'
 YOWNplot_RawData <- function(AQID,
-                                timeSeriesID="Wlevel_bgs.Calculated",
-                                saveTo = "desktop",
-                                AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
-                                login = Sys.getenv(c("AQUSER", "AQPASS")))
+                             timeSeriesID="Wlevel_bgs.Calculated",
+                             saveTo = "desktop",
+                             AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
+                             login = Sys.getenv(c("AQUSER", "AQPASS")))
 {
 
-  AQID = "YOWN-1901"
-  timeSeriesID="Wlevel_bgs.Calculated"
-  chartXInterval ="1 year"
-  saveTo = "desktop"
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
-  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  # AQID = "YOWN-1901"
+  # timeSeriesID="Wlevel_bgs.Calculated"
+  # chartXInterval ="1 year"
+  # saveTo = "desktop"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
@@ -90,8 +90,7 @@ YOWNplot_RawData <- function(AQID,
             to = paste0(saveTo, "/", AQID, "/", "YOWN_GradeKey.txt"),
             overwrite = TRUE)
 
-  print(paste0("Grade key and full record .csv written to ", saveTo, AQID))
-  return(final)
+  print(paste0("Grade key and full record .csv written to ", saveTo, "/", AQID))
 }
 
 
