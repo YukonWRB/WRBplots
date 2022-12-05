@@ -1,7 +1,3 @@
-#Load libraries and dependencies
-library(dplyr)
-library(cowplot)
-
 #' YOWN-WSC comparative plot generation relative to a common datum
 #'
 #' Plots YOWN data alongside WSC stations, in m asl. Only works for stations that have values in the "Elevation" field in their Aquarius information page.
@@ -48,8 +44,8 @@ YOWNplot_WSC <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", 
     print(i)
 
     # Download data from Aquarius
-    datalist <- WRBtools::aq_download(loc_id = i,
-                                      ts_name = "Wlevel_masl.Calculated")
+    datalist <- suppressMessages(WRBtools::aq_download(loc_id = i,
+                                      ts_name = "Wlevel_masl.Calculated"))
 
     # Unlist time series data
     timeseries <- datalist$timeseries
@@ -106,8 +102,8 @@ YOWNplot_WSC <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", 
     print(i)
 
     # Download data from Aquarius
-    datalist <- WRBtools::aq_download(loc_id = i,
-                                      ts_name = "Stage.Preliminary")
+    datalist <- suppressMessages(WRBtools::aq_download(loc_id = i,
+                                      ts_name = "Stage.Preliminary"))
 
     # Unlist time series data
     timeseries <- datalist$timeseries
