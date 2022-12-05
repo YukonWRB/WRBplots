@@ -78,13 +78,18 @@ YOWNplot_RawData <- function(AQID,
 
   rawdf <- rawdf[order(rawdf$timestamp_MST),] # Order by timestamp
   rawdf <- rawdf[!duplicated(rawdf["timestamp_MST"]),] #Remove second entry for duplicated timestamps
+  rawdf <- rawdf %>%
+    dplyr::select(timestamp_MST,
+                   value,
+                   grade_description)
 
 
   dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
 
   # Prepare and write time series and grading csv exports
-  write.csv(x = timeseries,
-            file = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", ".csv"))
+  write.csv(x = rawdf,
+            file = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", ".csv"),
+            row.names = FALSE)
 
   file.copy(from = "G:/water/Groundwater/2_YUKON_OBSERVATION_WELL_NETWORK/4_YOWN_DATA_ANALYSIS/1_WATER LEVEL/00_AUTOMATED_REPORTING/02_R_SUPPORT_FILES/YOWN_GradeKey.txt",
             to = paste0(saveTo, "/", AQID, "/", "YOWN_GradeKey.txt"),
