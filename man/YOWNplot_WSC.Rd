@@ -7,10 +7,11 @@
 YOWNplot_WSC(
   YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204",
     "YOWN-2205"),
-  WSCindex = c("09AH001"),
+  WSCindex = c("09AB004"),
   saveTo = "desktop",
   title = "YOWN wells vs. WSC Sites",
-  chartXinterval = "1 month"
+  chartXinterval = "1 month",
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
 )
 }
 \arguments{
@@ -20,9 +21,9 @@ YOWNplot_WSC(
 
 \item{saveTo}{Location for data files to be saved. Default is publication to a new folder on your desktop.}
 
-\item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
-
 \item{login}{Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.}
+
+\item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
 }
 \value{
 Writes .pdf plot of WSC and YOWN data

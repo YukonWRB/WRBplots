@@ -97,8 +97,6 @@ YOWNplot_SiteCompare <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN
   plotdf <- do.call(rbind, sitelist)
   rownames(plotdf) <- NULL
 
-  if(chartRange = "all")
-
   # Plot data, format and export
   plot <- ggplot2::ggplot() +
     geom_line(data = plotdf, aes(x = timestamp_MST, y = value, group = YOWNID, colour = YOWNID),
