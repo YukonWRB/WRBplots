@@ -82,6 +82,7 @@ YOWNplot_RawData <- function(AQID,
     dplyr::select(timestamp_MST,
                    value,
                    grade_description)
+  rawdf$value <- round(rawdf$value, 3)
 
 
   dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
