@@ -15,35 +15,32 @@
 #' @return Writes .pdf plot of WSC and YOWN data
 #'
 #' @export
-YOWNplot_SiteCompare <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205"),
+YOWNplot_SiteCompare <- function(YOWNindex,
                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                                 chartRange = "all",
-                                chartXInterval ="1 year",
+                                chartXInterval ="1 month",
                                 saveTo = "desktop",
                                 login = Sys.getenv(c("AQUSER", "AQPASS"))) {
 
-  index = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
-  chartRange = "all"
-  chartXInterval ="1 year"
-  saveTo = "desktop"
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
-  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  # YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
+  # chartRange = "all"
+  # chartXInterval ="1 year"
+  # saveTo = "desktop"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   if(tolower(saveTo) == "desktop") {
-    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
+    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop/")
   }
   if(dir.exists(saveTo) == FALSE) {
     stop("Specified directory does not exist")
   }
 
-  # Create index of desired YOWN stations for plotting
-  index <- c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
-
   # Create a list of data frames for plotting
   sitelist <- list()
 
   # Populate list
-  for (i in index) {
+  for (i in YOWNindex) {
 
     print(i)
 
@@ -75,15 +72,15 @@ YOWNplot_SiteCompare <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN
     if(nrow(gapdf != 0)){
       # Create a list of data frames for each identified data gap, fill in hourly time stamps
       gaplist <- list()
-      for(i in 1:nrow(gapdf)) {
-        df <- data.frame(seq.POSIXt(from = gapdf[i, 1], by = "-1 hour", length.out = gapdf[i, 8]), NA, as.character(-5), "MISSING DATA", gapdf$approval_level[i], gapdf$approval_description[i], NA, NA)
+      for(j in 1:nrow(gapdf)) {
+        df <- data.frame(seq.POSIXt(from = gapdf[j, 1], by = "-1 hour", length.out = gapdf[j, 8]), NA, as.character(-5), "MISSING DATA", gapdf$approval_level[j], gapdf$approval_description[j], NA, NA)
         colnames(df) <- colnames(gapdf)
-        gaplist[[i]] <- df
+        gaplist[[j]] <- df
       }
 
       # Merge all listed gap data frames, combine with original timeseries, order and format. If no gaps proceed with base timeseries
       gapmerge <- do.call(rbind, gaplist)
-      df <- dplyr::full_join(timeseries, gapmerge)
+      df <- suppressMessages(dplyr::full_join(timeseries, gapmerge))
     } else {
       df <- timeseries
     }
@@ -99,80 +96,80 @@ YOWNplot_SiteCompare <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN
 
   # Plot data, format and export
   plot <- ggplot2::ggplot() +
-    geom_line(data = plotdf, aes(x = timestamp_MST, y = value, group = YOWNID, colour = YOWNID),
+    ggplot2::geom_line(data = plotdf, ggplot2::aes(x = timestamp_MST, y = value, group = YOWNID, colour = YOWNID),
               na.rm = TRUE) +
-    guides(color = guide_legend(override.aes = list(size = 1.5), nrow = 1)) +
-    theme_cowplot() +
-    theme(plot.margin = unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
-          panel.border = element_rect(color = "grey",
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = 1.5), nrow = 1)) +
+    cowplot::theme_cowplot() +
+    ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
+          panel.border = ggplot2::element_rect(color = "grey",
                                       fill = NULL,
-                                      size = 0.5),
-          axis.text.x = element_text(angle = 0,
+                                      linewidth = 0.5),
+          axis.text.x = ggplot2::element_text(angle = 0,
                                      hjust  = 0.5,
                                      vjust = -0.5,
                                      size = 10),
-          axis.line.x.bottom = element_blank(),
-          axis.text.y = element_text(hjust = 1,
+          axis.line.x.bottom = ggplot2::element_blank(),
+          axis.text.y = ggplot2::element_text(hjust = 1,
                                      size = 10),
-          axis.title.y = element_text(vjust = 2,
+          axis.title.y = ggplot2::element_text(vjust = 2,
                                       size = 12,
                                       colour = "#464646"),
-          axis.line.y.left = element_blank(),
-          panel.grid.major = element_line(colour = "lightgrey", size = 0.5, linetype = 1),
+          axis.line.y.left = ggplot2::element_blank(),
+          panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
           legend.position = "bottom",
-          legend.title = element_blank(),
+          legend.title = ggplot2::element_blank(),
           legend.justification = "left",
-          legend.margin = margin(0,0,0,0),
-          legend.box.margin = margin(-18, 0, 0, -10),
-          legend.text = element_text(size = 9)) +
-    scale_x_datetime(name = "",
+          legend.margin = ggplot2::margin(0,0,0,0),
+          legend.box.margin = ggplot2::margin(-18, 0, 0, -10),
+          legend.text = ggplot2::element_text(size = 9)) +
+    ggplot2::scale_x_datetime(name = "",
                      limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
                      date_breaks = chartXInterval,
                      date_labels = "%b-%y",
                      expand = c(0, 0)) +
-    scale_y_reverse(name = "Water Level (m below ground surface)",
+    ggplot2::scale_y_reverse(name = "Water Level (m below ground surface)",
                     limits = c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor)),
                     breaks = seq(ceiling(max(na.omit(plotdf$value))), floor(min(na.omit(plotdf$value))), by = -0.25),
                     expand = c(0, 0))
 
   title <- ggplot2::ggplot() +
-    geom_blank() +
-    theme_minimal() +
-    labs(title = "Groundwater Level Record: Site Comparison") +
-    theme(plot.title = element_text(hjust = 0,
+    ggplot2::geom_blank() +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(title = "Groundwater Level Record: Site Comparison") +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                     vjust = 0,
                                     size = 14,
                                     colour = "#244C5A",
                                     face = "bold"),
-          plot.margin = unit(c(6.3, 0, 0, 0.51), "cm"))
+          plot.margin = ggplot2::unit(c(6.3, 0, 0, 0.51), "cm"))
 
   caption <- ggplot2::ggplot() +
-    geom_blank() +
-    theme_minimal() +
-    labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last site visit)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
-    theme(plot.title = element_text(hjust = 0,
+    ggplot2::geom_blank() +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last site visit)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                     vjust = 0,
                                     size = 9,
                                     colour = "#464646"),
-          plot.margin = unit(c(-2.39, 0, 0, 0.6), "cm"))
+          plot.margin = ggplot2::unit(c(-2.39, 0, 0, 0.6), "cm"))
 
   subtitle <- ggplot2::ggplot() +
-    geom_blank() +
-    theme_minimal() +
-    labs(title = paste0("Source Data: Aquarius Time Series", "\nWlevel_bgs.Calculated")) +
-    theme(plot.title = element_text(hjust = 0,
+    ggplot2::geom_blank() +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(title = paste0("Source Data: Aquarius Time Series", "\nWlevel_bgs.Calculated")) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                     vjust = 0,
                                     size = 10,
                                     color = "#464646"),
-          plot.margin = unit(c(6.85, 0, 0, 0.6), "cm"))
+          plot.margin = ggplot2::unit(c(6.85, 0, 0, 0.6), "cm"))
 
   # Use plot_grid method to combine titles, captions, and main plot in proper orientation
   final <- cowplot::plot_grid(title, subtitle, plot, caption, ncol = 1, nrow = 4, rel_heights = c(0.1, 0.1, 2, 0.1))
 
   # Add final aesthetic tweaks, print plot onto template
   final_plot <- cowplot::ggdraw() +
-    draw_image("G:\\water\\Groundwater\\2_YUKON_OBSERVATION_WELL_NETWORK\\4_YOWN_DATA_ANALYSIS\\1_WATER LEVEL\\00_AUTOMATED_REPORTING\\01_MARKUP_IMAGES\\template_nogrades.jpg") +
-    draw_plot(final)
+    cowplot::draw_image("G:\\water\\Groundwater\\2_YUKON_OBSERVATION_WELL_NETWORK\\4_YOWN_DATA_ANALYSIS\\1_WATER LEVEL\\00_AUTOMATED_REPORTING\\01_MARKUP_IMAGES\\template_nogrades.jpg") +
+    cowplot::draw_plot(final)
 
   ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "SiteCompare.pdf"),  height = 8.5, width = 11, units = "in")
 
