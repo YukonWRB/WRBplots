@@ -7,6 +7,7 @@
 #' Yukon River at Carmacks: 09AH001
 #'
 #' @param YOWNindex Character vector of YOWN site IDs (eg. c("YOWN-2201S", "YOWN-2201D", "YOWN-2202"))
+#' @param tsname Name of time series desired for plotting exactly as it appears in Aquarius (eg. Wlevel_btoc.Calculated)
 #' @param WSCindex Character vector of WSC site IDs (eg. c("09AB004", "09AH001"))
 #' @param saveTo Location for data files to be saved. Default is publication to a new folder on your desktop.
 #' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
@@ -16,6 +17,7 @@
 #'
 #' @export
 YOWNplot_SiteCompare <- function(YOWNindex,
+                                 tsname,
                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                                 chartRange = "all",
                                 chartXInterval ="1 month",
@@ -46,7 +48,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
 
     # Download data from Aquarius
     datalist <- WRBtools::aq_download(loc_id = i,
-                                      ts_name = "Wlevel_bgs.Calculated")
+                                      ts_name = ts_name)
 
     # Unlist time series data
     timeseries <- datalist$timeseries
