@@ -6,6 +6,7 @@
 \usage{
 YOWNplot_SiteCompare(
   YOWNindex,
+  tsunit,
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS",
   chartRange = "all",
   chartXInterval = "1 month",
@@ -15,6 +16,8 @@ YOWNplot_SiteCompare(
 }
 \arguments{
 \item{YOWNindex}{Character vector of YOWN site IDs (eg. c("YOWN-2201S", "YOWN-2201D", "YOWN-2202"))}
+
+\item{tsunit}{Desired timeseries for plotting, CHOOSE FROM: "btoc", "bgs", "asl"}
 
 \item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
 

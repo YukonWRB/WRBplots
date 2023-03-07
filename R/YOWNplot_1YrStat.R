@@ -263,7 +263,7 @@ YOWNplot_1YrStat <- function(AQID,
   subtitle <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Source Data: ", AQID, "@", AQID,  "\nLatitude: ", datalist[["metadata"]][5, 2], ", ", "Longitude: ", datalist[["metadata"]][6, 2],", ", "Elevation: ", datalist[["metadata"]][7, 2], " ", datalist[["metadata"]][8, 2])) +
+    ggplot2::labs(title = paste0("Source Data: ", AQID, "@", timeSeriesID,  "\nLatitude: ", datalist[["metadata"]][5, 2], ", ", "Longitude: ", datalist[["metadata"]][6, 2],", ", "Elevation: ", datalist[["metadata"]][7, 2], " ", datalist[["metadata"]][8, 2])) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                     vjust = 0,
                                     size = 10,

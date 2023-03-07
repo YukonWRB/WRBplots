@@ -7,7 +7,7 @@
 #' Yukon River at Carmacks: 09AH001
 #'
 #' @param YOWNindex Character vector of YOWN site IDs (eg. c("YOWN-2201S", "YOWN-2201D", "YOWN-2202"))
-#' @param tsname Name of time series desired for plotting exactly as it appears in Aquarius (eg. Wlevel_btoc.Calculated)
+#' @param tsunit Desired timeseries for plotting, CHOOSE FROM: "btoc", "bgs", "asl"
 #' @param WSCindex Character vector of WSC site IDs (eg. c("09AB004", "09AH001"))
 #' @param saveTo Location for data files to be saved. Default is publication to a new folder on your desktop.
 #' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
@@ -17,12 +17,12 @@
 #'
 #' @export
 YOWNplot_SiteCompare <- function(YOWNindex,
-                                 tsname,
-                                AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
-                                chartRange = "all",
-                                chartXInterval ="1 month",
-                                saveTo = "desktop",
-                                login = Sys.getenv(c("AQUSER", "AQPASS"))) {
+                                 tsunit,
+                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
+                                 chartRange = "all",
+                                 chartXInterval ="1 month",
+                                 saveTo = "desktop",
+                                 login = Sys.getenv(c("AQUSER", "AQPASS"))) {
 
   # YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
   # chartRange = "all"
@@ -31,12 +31,28 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   # login = Sys.getenv(c("AQUSER", "AQPASS"))
   # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
+  # Format save location
   if(tolower(saveTo) == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop/")
   }
   if(dir.exists(saveTo) == FALSE) {
     stop("Specified directory does not exist")
   }
+
+  # Format chart labels based on time series ID
+  if(tsunit == "asl"){
+    print("Generating plot in m asl")
+    axislab <- "Water Level (m above sea level)"
+    ts_name <- "Wlevel_masl.Calculated"
+  } else if(tsunit == "btoc") {
+    print("Generating plot in m btoc")
+    axislab <- "Water Level (m below top of casing)"
+    ts_name <- "Wlevel_btoc.Calculated"
+  } else if(tsunit == "bgs"){
+    print("Generating plot in m bgs")
+    axislab <- "Water Level (m below ground surface)"
+    ts_name <- "Wlevel_bgs.Calculated"
+  } else {print("Please double check the type of plot specified")}
 
   # Create a list of data frames for plotting
   sitelist <- list()
@@ -99,71 +115,85 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   # Plot data, format and export
   plot <- ggplot2::ggplot() +
     ggplot2::geom_line(data = plotdf, ggplot2::aes(x = timestamp_MST, y = value, group = YOWNID, colour = YOWNID),
-              na.rm = TRUE) +
+                       na.rm = TRUE) +
     ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = 1.5), nrow = 1)) +
     cowplot::theme_cowplot() +
     ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
-          panel.border = ggplot2::element_rect(color = "grey",
-                                      fill = NULL,
-                                      linewidth = 0.5),
-          axis.text.x = ggplot2::element_text(angle = 0,
-                                     hjust  = 0.5,
-                                     vjust = -0.5,
-                                     size = 10),
-          axis.line.x.bottom = ggplot2::element_blank(),
-          axis.text.y = ggplot2::element_text(hjust = 1,
-                                     size = 10),
-          axis.title.y = ggplot2::element_text(vjust = 2,
-                                      size = 12,
-                                      colour = "#464646"),
-          axis.line.y.left = ggplot2::element_blank(),
-          panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
-          legend.position = "bottom",
-          legend.title = ggplot2::element_blank(),
-          legend.justification = "left",
-          legend.margin = ggplot2::margin(0,0,0,0),
-          legend.box.margin = ggplot2::margin(-18, 0, 0, -10),
-          legend.text = ggplot2::element_text(size = 9)) +
+                   panel.border = ggplot2::element_rect(color = "grey",
+                                                        fill = NULL,
+                                                        linewidth = 0.5),
+                   axis.text.x = ggplot2::element_text(angle = 0,
+                                                       hjust  = 0.5,
+                                                       vjust = -0.5,
+                                                       size = 10),
+                   axis.line.x.bottom = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_text(hjust = 1,
+                                                       size = 10),
+                   axis.title.y = ggplot2::element_text(vjust = 2,
+                                                        size = 12,
+                                                        colour = "#464646"),
+                   axis.line.y.left = ggplot2::element_blank(),
+                   panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
+                   legend.position = "bottom",
+                   legend.title = ggplot2::element_blank(),
+                   legend.justification = "left",
+                   legend.margin = ggplot2::margin(0,0,0,0),
+                   legend.box.margin = ggplot2::margin(-18, 0, 0, -10),
+                   legend.text = ggplot2::element_text(size = 9))
+  # Format chart labels based on time series ID
+  if(tsunit == "asl"){
+    limits <- c(plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor), plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling))
+    breaks <- seq(floor(min(na.omit(plotdf$value))), ceiling(max(na.omit(plotdf$value))), by = 0.25)
+    plot +
+      ggplot2::scale_y_continuous(name = axislab,
+                                  limits = limits,
+                                  breaks = breaks,
+                                  expand = c(0, 0))
+  } else if(tsunit == "btoc | bgs") {
+    limits <- c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor))
+    breaks <- seq(ceiling(max(na.omit(plotdf$value))), floor(min(na.omit(plotdf$value))), by = 0.25)
+    plot + ggplot2::scale_y_continuous(name = axislab,
+                                limits = limits,
+                                breaks = breaks,
+                                expand = c(0, 0))
+  }
     ggplot2::scale_x_datetime(name = "",
-                     limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
-                     date_breaks = chartXInterval,
-                     date_labels = "%b-%y",
-                     expand = c(0, 0)) +
-    ggplot2::scale_y_reverse(name = "Water Level (m below ground surface)",
-                    limits = c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor)),
-                    breaks = seq(ceiling(max(na.omit(plotdf$value))), floor(min(na.omit(plotdf$value))), by = -0.25),
-                    expand = c(0, 0))
+                              limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
+                              date_breaks = chartXInterval,
+                              date_labels = "%b-%y",
+                              expand = c(0, 0)) +
+
 
   title <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
     ggplot2::labs(title = "Groundwater Level Record: Site Comparison") +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
-                                    vjust = 0,
-                                    size = 14,
-                                    colour = "#244C5A",
-                                    face = "bold"),
-          plot.margin = ggplot2::unit(c(6.3, 0, 0, 0.51), "cm"))
+                                                      vjust = 0,
+                                                      size = 14,
+                                                      colour = "#244C5A",
+                                                      face = "bold"),
+                   plot.margin = ggplot2::unit(c(6.3, 0, 0, 0.51), "cm"))
 
   caption <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
     ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last site visit)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
-                                    vjust = 0,
-                                    size = 9,
-                                    colour = "#464646"),
-          plot.margin = ggplot2::unit(c(-2.39, 0, 0, 0.6), "cm"))
+                                                      vjust = 0,
+                                                      size = 9,
+                                                      colour = "#464646"),
+                   plot.margin = ggplot2::unit(c(-2.39, 0, 0, 0.6), "cm"))
 
   subtitle <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Source Data: Aquarius Time Series", "\nWlevel_bgs.Calculated")) +
+    ggplot2::labs(title = paste0("Source Data: Aquarius Time Series", "\n", tsname)) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
-                                    vjust = 0,
-                                    size = 10,
-                                    color = "#464646"),
-          plot.margin = ggplot2::unit(c(6.85, 0, 0, 0.6), "cm"))
+                                                      vjust = 0,
+                                                      size = 10,
+                                                      color = "#464646"),
+                   plot.margin = ggplot2::unit(c(6.85, 0, 0, 0.6), "cm"))
 
   # Use plot_grid method to combine titles, captions, and main plot in proper orientation
   final <- cowplot::plot_grid(title, subtitle, plot, caption, ncol = 1, nrow = 4, rel_heights = c(0.1, 0.1, 2, 0.1))
@@ -178,4 +208,3 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   print("Site Comparison Plot Generated")
 
 }
-

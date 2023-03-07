@@ -16,19 +16,20 @@
 #'
 #' @export
 
-YOWNplot_WSC <- function(YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205"),
-                         WSCindex = c("09AB004"),
+YOWNplot_WSC <- function(YOWNindex,
+                         WSCindex,
                          saveTo = "desktop",
                          title = "YOWN wells vs. WSC Sites",
                          chartXinterval = "1 month",
                          login = Sys.getenv(c("AQUSER", "AQPASS"))) {
 
-  # YOWNindex = c("YOWN-2006S", "YOWN-2006D")
-  # WSCindex = c("09AH001")
-  # saveTo = "desktop"
-  # title = "YOWN wells vs. WSC Sites"
-  # chartXinterval = "1 month"
-  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+
+  YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
+  WSCindex = c("09AB004")
+  saveTo = "desktop"
+  title = "YOWN wells vs. WSC Sites"
+  chartXinterval = "1 month"
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
 
 
 
