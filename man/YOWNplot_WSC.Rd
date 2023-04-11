@@ -5,9 +5,8 @@
 \title{YOWN-WSC comparative plot generation relative to a common datum}
 \usage{
 YOWNplot_WSC(
-  YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204",
-    "YOWN-2205"),
-  WSCindex = c("09AB004"),
+  YOWNindex,
+  WSCindex,
   saveTo = "desktop",
   title = "YOWN wells vs. WSC Sites",
   chartXinterval = "1 month",
