@@ -1,41 +1,41 @@
-#' YOWNplot
-#'
-#' Generalized YOWN plotting function
-#'
-#' @param AQID YOWN location for which a plot will be generated
-#' @param timeSeriesID Aquarius time series ID exactly as in Aquarius (ie. "Wlevel_bgs.Calculated"). Defaults to m bgs.
-#' @param chartXinterval X axis interval, can be specified "auto" for best fit calculation, or as desired (ie. "1 day", "1 month", "1 year", etc.). Defaults to "auto"
-#' @param chartXlimits X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00"). Defaults to "all"
-#' @param stats TRUE/FALSE Add historical max/min and average to plot, where sufficient data exists.
-#' @param smooth TRUE/FALSE Plot rolling 5 day average instead of individual values.
-#' @param saveTo Directory in which the plot will be saved. Can specify "desktop" to create YOWN ID folder on desktop as save directory.
-#' @param login Aquarius username and password, taken from Renviron file
-#' @param AQTSServerID Aquarius server ID
-#'
-#' @return Writes a .pdf containing YOWN data in the specified directory.
-#' @export
-#'
-#'
-YOWNplot <- function(AQID,
-                     timeSeriesID = "Wlevel_bgs.Calculated",
-                     chartXinterval = "auto",
-                     chartXlimits = "all",
-                     stats = TRUE,
-                     smooth = TRUE, # Applies 5-day moving average smoothing function to data before plotting
-                     saveTo = "desktop",
-                     login = Sys.getenv(c("AQUSER", "AQPASS")), # Pull Aquarius login information from Renviron file
-                     AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"){
+#' #' YOWNplot
+#' #'
+#' #' Generalized YOWN plotting function
+#' #'
+#' #' @param AQID YOWN location for which a plot will be generated
+#' #' @param timeSeriesID Aquarius time series ID exactly as in Aquarius (ie. "Wlevel_bgs.Calculated"). Defaults to m bgs.
+#' #' @param chartXinterval X axis interval, can be specified "auto" for best fit calculation, or as desired (ie. "1 day", "1 month", "1 year", etc.). Defaults to "auto"
+#' #' @param chartXlimits X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00"). Defaults to "all"
+#' #' @param stats TRUE/FALSE Add historical max/min and average to plot, where sufficient data exists.
+#' #' @param smooth TRUE/FALSE Plot rolling 5 day average instead of individual values.
+#' #' @param saveTo Directory in which the plot will be saved. Can specify "desktop" to create YOWN ID folder on desktop as save directory.
+#' #' @param login Aquarius username and password, taken from Renviron file
+#' #' @param AQTSServerID Aquarius server ID
+#' #'
+#' #' @return Writes a .pdf containing YOWN data in the specified directory.
+#' #' @export
+#' #'
+#' #'
+#' YOWNplot <- function(AQID = "YOWN-1925",
+#'                      timeSeriesID = "Wlevel_bgs.Calculated",
+#'                      chartXinterval = "auto",
+#'                      chartXlimits = "all",
+#'                      stats = TRUE,
+#'                      smooth = TRUE, # Applies 5-day moving average smoothing function to data before plotting
+#'                      saveTo = "desktop",
+#'                      login = Sys.getenv(c("AQUSER", "AQPASS")), # Pull Aquarius login information from Renviron file
+#'                      AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"){
 
   # Debug and development params. Leave as comments.
-  # AQID = "YOWN-0804" # Single YOWN site for plotting
-  # timeSeriesID = "Wlevel_bgs.Calculated"
-  # chartXinterval = "auto" # specify "auto" for best fit calculation, or can be specified as desired (ie. "1 day", "1 month", "1 year", etc.)
-  # chartXlimits = "all" # can be "all", "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00")
-  # stats = TRUE
-  # smooth = TRUE # Applies 5-day moving average smoothing function to data before plotting
-  # saveTo = "desktop"
-  # login = Sys.getenv(c("AQUSER", "AQPASS")) # Pull Aquarius login information from Renviron file
-  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  AQID = "YOWN-2201S"
+  timeSeriesID = "Wlevel_masl.Calculated"
+  chartXinterval = "auto"
+  chartXlimits = "all"
+  stats = TRUE
+  smooth = FALSE
+  saveTo = "desktop"
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   #### Preliminary stuff ####
   # Deal with file save location
@@ -150,6 +150,12 @@ YOWNplot <- function(AQID,
     # Trim data to chart x limits
     plotdf <- subset(fulldf, fulldf$timestamp_MST >= (min(chartXlimits)) & fulldf$timestamp_MST <= (max(chartXlimits)))
 
+    # Apply smoothing function to "value" column for plotting
+    if(smooth == TRUE){
+      plotdf <- plotdf %>%
+        dplyr::mutate(value = zoo::rollmean(x = plotdf$value, k = 1440, fill = "extend", partial = TRUE))
+    }
+
     # Calculate chart X interval if "auto" specified
     if(chartXinterval == "auto"){
       diff <- as.numeric(difftime(max(plotdf$timestamp), min(plotdf$timestamp), units = "days"))
@@ -243,6 +249,12 @@ YOWNplot <- function(AQID,
     NAcomp <- rle(!is.na(plotdf$value))
     NAcomp$values[which(NAcomp$lengths>6 & !NAcomp$values)] <- TRUE
     NAadd <- inverse.rle(NAcomp)
+
+    # Apply smoothing function to "value" column for plotting
+    if(smooth == TRUE){
+      plotdf <- plotdf %>%
+        dplyr::mutate(value = zoo::rollmean(x = plotdf$value, k = 1440, fill = "extend", partial = TRUE))
+    }
 
     # Create plots, add aesthetic tweaks
     plot <- ggplot2::ggplot() +
@@ -381,4 +393,4 @@ YOWNplot <- function(AQID,
   ggplot2::ggsave(plot = final_plot, filename = paste0(saveTo, "/", AQID, "/", AQID, "_YOWNplot_", name, "_", stats, ".pdf"),  height = 8.5, width = 11, units = "in")
 
   print(paste0("Plot written to ", saveTo, "/", AQID))
-}
+# }
