@@ -5,7 +5,7 @@
 \title{YOWNplot}
 \usage{
 YOWNplot(
-  AQID,
+  AQID = "YOWN-1925",
   timeSeriesID = "Wlevel_bgs.Calculated",
   chartXinterval = "auto",
   chartXlimits = "all",
