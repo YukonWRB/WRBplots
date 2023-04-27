@@ -5,12 +5,12 @@
 \title{YOWNplot}
 \usage{
 YOWNplot(
-  AQID = "YOWN-1925",
+  AQID,
   timeSeriesID = "Wlevel_bgs.Calculated",
   chartXinterval = "auto",
-  chartXlimits = "all",
+  dateRange = "all",
   stats = TRUE,
-  smooth = TRUE,
+  smooth = 14,
   saveTo = "desktop",
   login = Sys.getenv(c("AQUSER", "AQPASS")),
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS"
@@ -19,19 +19,19 @@ YOWNplot(
 \arguments{
 \item{AQID}{YOWN location for which a plot will be generated}
 
-\item{timeSeriesID}{Aquarius time series ID exactly as in Aquarius (ie. "Wlevel_bgs.Calculated"). Defaults to m bgs.}
+\item{timeSeriesID}{Aquarius time series ID exactly as in Aquarius (ie. "Wlevel_bgs.Calculated", "Wlevel_masl.Calculated"). Defaults to m bgs.}
 
 \item{chartXinterval}{X axis interval, can be specified "auto" for best fit calculation, or as desired (ie. "1 day", "1 month", "1 year", etc.). Defaults to "auto"}
 
-\item{chartXlimits}{X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00"). Defaults to "all"}
+\item{dateRange}{X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00"). Defaults to "all"}
 
 \item{stats}{TRUE/FALSE Add historical max/min and average to plot, where sufficient data exists.}
 
-\item{smooth}{TRUE/FALSE Plot rolling 5 day average instead of individual values.}
+\item{smooth}{can be FALSE or a day value (ie. 14) for plotting rolling average}
 
 \item{saveTo}{Directory in which the plot will be saved. Can specify "desktop" to create YOWN ID folder on desktop as save directory.}
 
-\item{login}{Aquarius username and password, taken from Renviron file}
+\item{login}{Aquarius username and password, taken from Renviron files}
 
 \item{AQTSServerID}{Aquarius server ID}
 }

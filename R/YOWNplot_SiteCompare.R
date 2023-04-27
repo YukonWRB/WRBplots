@@ -24,12 +24,13 @@ YOWNplot_SiteCompare <- function(YOWNindex,
                                  saveTo = "desktop",
                                  login = Sys.getenv(c("AQUSER", "AQPASS"))) {
 
-  # YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
-  # chartRange = "all"
-  # chartXInterval ="1 year"
-  # saveTo = "desktop"
-  # login = Sys.getenv(c("AQUSER", "AQPASS"))
-  # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
+  tsunit = "asl"
+  chartRange = "all"
+  chartXInterval ="1 month"
+  saveTo = "desktop"
+  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
   # Format save location
   if(tolower(saveTo) == "desktop") {
@@ -118,6 +119,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
                        na.rm = TRUE) +
     ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = 1.5), nrow = 1)) +
     cowplot::theme_cowplot() +
+    ggplot2::labs(y = paste0("Groundwater level (m ", tsunit, ")")) +
     ggplot2::theme(plot.margin = ggplot2::unit(c(4.2, 1.6, 3.1, 1.2), "cm"),
                    panel.border = ggplot2::element_rect(color = "grey",
                                                         fill = NULL,
@@ -129,39 +131,39 @@ YOWNplot_SiteCompare <- function(YOWNindex,
                    axis.line.x.bottom = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_text(hjust = 1,
                                                        size = 10),
-                   axis.title.y = ggplot2::element_text(vjust = 2,
-                                                        size = 12,
-                                                        colour = "#464646"),
+                   axis.title.x = ggplot2::element_blank(),
                    axis.line.y.left = ggplot2::element_blank(),
                    panel.grid.major = ggplot2::element_line(colour = "lightgrey", linewidth = 0.5, linetype = 1),
                    legend.position = "bottom",
                    legend.title = ggplot2::element_blank(),
                    legend.justification = "left",
                    legend.margin = ggplot2::margin(0,0,0,0),
-                   legend.box.margin = ggplot2::margin(-18, 0, 0, -10),
+                   legend.box.margin = ggplot2::margin(-10, 0, 0, -10),
                    legend.text = ggplot2::element_text(size = 9))
+
   # Format chart labels based on time series ID
   if(tsunit == "asl"){
     limits <- c(plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor), plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling))
     breaks <- seq(floor(min(na.omit(plotdf$value))), ceiling(max(na.omit(plotdf$value))), by = 0.25)
-    plot +
-      ggplot2::scale_y_continuous(name = axislab,
-                                  limits = limits,
-                                  breaks = breaks,
-                                  expand = c(0, 0))
+
+    plot <- plot + ggplot2::scale_y_continuous(name = "",
+                                       limits = limits,
+                                       breaks = breaks,
+                                       expand = c(0, 0))
   } else if(tsunit == "btoc | bgs") {
     limits <- c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor))
     breaks <- seq(ceiling(max(na.omit(plotdf$value))), floor(min(na.omit(plotdf$value))), by = 0.25)
-    plot + ggplot2::scale_y_continuous(name = axislab,
-                                limits = limits,
-                                breaks = breaks,
-                                expand = c(0, 0))
+    plot <- plot + ggplot2::scale_y_reverse(name = paste0("Groundwater level (m ", tsunit, " )"),
+                                       limits = limits,
+                                       breaks = breaks,
+                                       expand = c(0, 0))
   }
-    ggplot2::scale_x_datetime(name = "",
-                              limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
-                              date_breaks = chartXInterval,
-                              date_labels = "%b-%y",
-                              expand = c(0, 0)) +
+
+  plot <- plot + ggplot2::scale_x_datetime(name = "",
+                                   limits = c(min(plotdf$timestamp_MST), max(plotdf$timestamp_MST)),
+                                   date_breaks = chartXInterval,
+                                   date_labels = "%b-%y",
+                                   expand = c(0, 0))
 
 
   title <- ggplot2::ggplot() +
@@ -178,7 +180,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   caption <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last site visit)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
+    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last data entry)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                                       vjust = 0,
                                                       size = 9,
@@ -188,7 +190,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   subtitle <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Source Data: Aquarius Time Series", "\n", tsname)) +
+    ggplot2::labs(title = paste0("Source Data: Aquarius Time Series, ", tsunit)) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                                       vjust = 0,
                                                       size = 10,
