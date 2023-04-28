@@ -9,8 +9,8 @@ YOWNplot(
   timeSeriesID = "Wlevel_bgs.Calculated",
   chartXinterval = "auto",
   dateRange = "all",
-  stats = TRUE,
-  smooth = 14,
+  stats = FALSE,
+  smooth = FALSE,
   saveTo = "desktop",
   login = Sys.getenv(c("AQUSER", "AQPASS")),
   AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS"
@@ -23,13 +23,13 @@ YOWNplot(
 
 \item{chartXinterval}{X axis interval, can be specified "auto" for best fit calculation, or as desired (ie. "1 day", "1 month", "1 year", etc.). Defaults to "auto"}
 
-\item{dateRange}{X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01 00:00:00", "2023/01/01 00:00:00"). Defaults to "all"}
+\item{dateRange}{X axis limits, can be "all" for all data, "1yr" for most recent year of data, or vector of 2 in format c("2020/01/01", "2023/01/01"). Defaults to "all". Does not apply to stats = "line", which always plots the most current year of data.}
 
-\item{stats}{TRUE/FALSE Add historical max/min and average to plot, where sufficient data exists.}
+\item{stats}{Can be "line", "ribbon", or FALSE. Line shows years plotted in separate lines, ribbon shows max/min ribbon geom, and FALSE excludes stats. If set to "line", dateRange ignored as most current year of data will be plotted alongside historical data.}
 
-\item{smooth}{can be FALSE or a day value (ie. 14) for plotting rolling average}
+\item{smooth}{Can be FALSE or a numeric day value (ie. 14) for plotting rolling average}
 
-\item{saveTo}{Directory in which the plot will be saved. Can specify "desktop" to create YOWN ID folder on desktop as save directory.}
+\item{saveTo}{Directory in which the plot will be saved. Can specify "desktop" to automatically create YOWN ID folder on desktop as save directory.}
 
 \item{login}{Aquarius username and password, taken from Renviron files}
 
