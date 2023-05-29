@@ -8,4 +8,21 @@
 \description{
 Functions that facilitate the generation of custom plots from several different data sources. Currently set up to work with data directly from Aquarius and from the local hydrometric database.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/YukonWRB/WRBplots}
+  \item Report bugs at \url{https://github.com/YukonWRB/WRBplots/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Cole Fischer \email{cole.fischer@hotmail.com} (\href{https://orcid.org/0000-0002-7266-5760}{ORCID})
+
+Authors:
+\itemize{
+  \item Ghislain de Laplante \email{ghislaindel@gmail.com} (\href{https://orcid.org/0000-0002-5093-9185}{ORCID})
+}
+
+}
 \keyword{internal}
