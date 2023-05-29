@@ -1,7 +1,7 @@
 #' Discrete hydromet data plotting
 #'
 #' @description
-#' `r lifecycle::badge('experimental')`
+#' `r lifecycle::badge('stable')`
 #'
 #' Generate plots of snow survey data (SWE and depth) or other variables sampled at regular intervals (weekly or monthly).
 #'
@@ -13,6 +13,7 @@
 #' @param parameter The parameter you wish to plot. The location:parameter combo must be in the local database.
 #' @param startDay NOT CURRENTLY IN USE The start day of year for the plot x-axis. Can be specified as a number from 1 to 365, as a character string of form "yyyy-mm-dd", or as a date object. Either way the day of year is the only portion used, specify years to plot under parameter `years`.
 #' @param endDay NOT CURRENTLY IN USE The end day of year for the plot x-axis. As per `startDay`.
+#' @param tzone The timezone to use for fetching data. Datetimes are stored in the database in UTC offset, so this parameter could make a difference to what day a particular sample is considered to be on. In most cases you can ignore this parameter.
 #' @param years The years to plot. If `startDay` and `endDay` cover December 31 - January 1, select the December year(s). Max 10 years, NULL = current year.
 #' @param title Should a title be included?
 #' @param plot_type Choose from "violin" or "boxplot".
@@ -25,28 +26,29 @@
 #'
 
 hydrometDiscrete <- function(location,
-                         parameter,
-                         startDay = 1,
-                         endDay = 365,
-                         years = NULL,
-                         title = TRUE,
-                         plot_type = "violin",
-                         plot_scale = 1,
-                         save_path = NULL,
-                         dbPath = "default")
+                             parameter,
+                             startDay = 1,
+                             endDay = 365,
+                             tzone = "MST",
+                             years = NULL,
+                             title = TRUE,
+                             plot_type = "violin",
+                             plot_scale = 1,
+                             save_path = NULL,
+                             dbPath = "default")
 {
   # Commented code below is for testing...
-  location = "09AA-SC03"
-  parameter = "SWE"
-  startDay = 1
-  endDay = 365
-  tzone = "MST"
-  years = c(2021,2022,2023)
-  title = TRUE
-  plot_scale = 1
-  plot_type = "violin"
-  save_path = NULL
-  dbPath = "default"
+  # location = "09AA-SC03"
+  # parameter = "SWE"
+  # startDay = 1
+  # endDay = 365
+  # tzone = "MST"
+  # years = c(2019,2020,2021,2022,2023)
+  # title = TRUE
+  # plot_scale = 1
+  # plot_type = "violin"
+  # save_path = NULL
+  # dbPath = "default"
 
   #TODO Should give a decent error message if the user requests something that doesn't exist. Station not existing, timeseries not existing, years not available (and where they are), etc.
 
@@ -62,9 +64,9 @@ hydrometDiscrete <- function(location,
 
   if (is.null(years)){
     years <- as.numeric(substr(Sys.Date(), 1, 4))
-    years <- sort(years, decreasing = TRUE)
   } else {
     years <- as.numeric(years)
+    years <- sort(years, decreasing = TRUE)
     if (length(years) > 10){
       years <- years[1:10]
       print("The parameter 'years' can only have up to 10 years. It's been truncated to the first 10 years in the vector.")
@@ -186,14 +188,14 @@ hydrometDiscrete <- function(location,
     ggplot2::theme(legend.position = "right", legend.justification = c(0, 0.95), legend.text = ggplot2::element_text(size = 8*plot_scale), legend.title = ggplot2::element_text(size = 10*plot_scale), axis.title.y = ggplot2::element_text(size = 12*plot_scale), axis.text.x = ggplot2::element_text(size = 9*plot_scale), axis.text.y = ggplot2::element_text(size = 9*plot_scale))
   if (plot_type == "violin") {
     plot <- plot +
-      ggplot2::geom_violin(draw_quantiles = c(0.5), adjust = 0.8, width = 20, alpha = 0.8, fill = "aliceblue")
+      ggplot2::geom_violin(draw_quantiles = c(0.5), adjust = 0.7, width = 15, alpha = 0.8, fill = "aliceblue")
   } else if (plot_type == "boxplot"){
     plot <- plot +
-      ggplot2::geom_boxplot(varwidth = TRUE)
+      ggplot2::geom_boxplot(outlier.shape = 8 , outlier.size = 1.7*plot_scale, color = "black", fill = "aliceblue", varwidth = TRUE)
   }
   plot <- plot +
     ggplot2::geom_point(data = discrete, mapping = ggplot2::aes(x = fake_date, y = value, colour = as.factor(year), fill = as.factor(year)), size = plot_scale*3.5, shape = 21) +
-    ggplot2::scale_colour_manual(name = "Year", labels = rev(unique(discrete$year)), values = colours[1:legend_length], aesthetics = c("colour", "fill"), na.translate = FALSE, breaks=rev(unique(stats::na.omit(discrete$year))[1:legend_length]))
+    ggplot2::scale_colour_manual(name = "Year", labels = unique(discrete$year), values = colours[1:legend_length], aesthetics = c("colour", "fill"), na.translate = FALSE, breaks=unique(stats::na.omit(discrete$year))[1:legend_length])
 
   # Wrap things up and return() -----------------------
   if (title == TRUE){
