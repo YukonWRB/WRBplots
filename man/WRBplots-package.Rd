@@ -6,10 +6,6 @@
 \alias{WRBplots-package}
 \title{WRBplots: Make pretty, standard plots for a variety of WRB uses}
 \description{
-Functions that facilitate the generation of custom plots from data downloaded from Aquarius.
-}
-\author{
-\strong{Maintainer}: Cole Fischer \email{cole.fischer@hotmail.com} (\href{https://orcid.org/0000-0002-7266-5760}{ORCID})
-
+Functions that facilitate the generation of custom plots from several different data sources. Currently set up to work with data directly from Aquarius and from the local hydrometric database.
 }
 \keyword{internal}

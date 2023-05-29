@@ -4,8 +4,9 @@ Version: 1.2.0
 Authors@R: 
     person("Cole", "Fischer", , "cole.fischer@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7266-5760"))
-Description: Functions that facilitate the generation of custom plots from
-    data downloaded from Aquarius.
+    person("Ghislain", "de Laplante", , "ghislaindel@gmail.com", role = c("aut"),
+           comment = c(ORCID = "0000-0002-5093-9185"))
+Description: Functions that facilitate the generation of custom plots from several different data sources. Currently set up to work with data directly from Aquarius and from the local hydrometric database.
 License: AGPL (>= 3) + file LICENSE
 Depends: 
     R (>= 2.10)
