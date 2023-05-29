@@ -1,43 +1,53 @@
 #' YOWN site comparative plot generation, in m bgs
 #'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Plots multiple YOWN stations on the same chart
 #'
-#' To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
-#' Marsh Lake: 09AB004
-#' Yukon River at Carmacks: 09AH001
+#' @details
+#' To store login credentials in your .renviron profile, call [usethis::edit_r_environ()] and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 #'
 #' @param YOWNindex Character vector of YOWN site IDs (eg. c("YOWN-2201S", "YOWN-2201D", "YOWN-2202"))
 #' @param tsunit Desired timeseries for plotting, CHOOSE FROM: "btoc", "bgs", "asl"
-#' @param WSCindex Character vector of WSC site IDs (eg. c("09AB004", "09AH001"))
-#' @param saveTo Location for data files to be saved. Default is publication to a new folder on your desktop.
-#' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
-#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
+#' @param chartRange ???
+#' @param chartXInterval ????
+#' @param saveTo Location for data files to be saved as a character vector. Default "desktop" is to a new folder on your desktop; "choose" lets you interactively choose your save location.
+#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details. Passed to [WRBtools::aq_download()].
+#' @param server Defaults to Yukon Water Resources Branch Aquarius web server. Passed to [WRBtools::aq_download()].
 #'
 #' @return Writes .pdf plot of WSC and YOWN data
 #'
 #' @export
+
+#TODO: Fill in documentation above
+#TODO: pass login and server parameters to the aq_download function
+
 YOWNplot_SiteCompare <- function(YOWNindex,
                                  tsunit,
-                                 AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
                                  chartRange = "all",
                                  chartXInterval ="1 month",
                                  saveTo = "desktop",
-                                 login = Sys.getenv(c("AQUSER", "AQPASS"))) {
+                                 login = Sys.getenv(c("AQUSER", "AQPASS")),
+                                 server ="https://yukon.aquaticinformatics.net/AQUARIUS") {
 
-  YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
-  tsunit = "asl"
-  chartRange = "all"
-  chartXInterval ="1 month"
-  saveTo = "desktop"
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
-  AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
+  # YOWNindex = c("YOWN-2210", "YOWN-2211", "YOWN-2212S", "YOWN-2212D", "YOWN-2213", "YOWN-2214", "YOWN-2215S", "YOWN-2215D")
+  # tsunit = "asl"
+  # chartRange = "all"
+  # chartXInterval ="1 month"
+  # saveTo = "desktop"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # server ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
-  # Format save location
-  if(tolower(saveTo) == "desktop") {
+  # Sort out save location
+  saveTo <- tolower(saveTo)
+  if (save_path %in% c("Choose", "choose")) {
+    print("Select the folder where you want this graph saved.")
+    save_path <- as.character(utils::choose.dir(caption="Select Save Folder"))
+  } else if(saveTo == "desktop") {
     saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop/")
-  }
-  if(dir.exists(saveTo) == FALSE) {
-    stop("Specified directory does not exist")
+  } else if (dir.exists(saveTo) == FALSE) {
+    stop("Specified directory does not exist. Consider specifying save path as one of 'choose' or 'desktop'; refer to help file.")
   }
 
   # Format chart labels based on time series ID
@@ -61,11 +71,15 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   # Populate list
   for (i in YOWNindex) {
 
+    #TODO: Cole, is line below intended as a debug/dev thing?
     print(i)
 
     # Download data from Aquarius
+    #TODO: pass the aqts server ID, username, password to this function in case they ever change
     datalist <- WRBtools::aq_download(loc_id = i,
-                                      ts_name = ts_name)
+                                      ts_name = ts_name,
+                                      login = login,
+                                      server = server)
 
     # Unlist time series data
     timeseries <- datalist$timeseries
@@ -105,7 +119,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
     }
     df$YOWNID <- i
     df <- df %>%
-      dplyr::select(YOWNID, everything())
+      dplyr::select(YOWNID, tidyselect::everything())
     sitelist[[i]] <- df
   }
 
@@ -143,16 +157,16 @@ YOWNplot_SiteCompare <- function(YOWNindex,
 
   # Format chart labels based on time series ID
   if(tsunit == "asl"){
-    limits <- c(plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor), plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling))
-    breaks <- seq(floor(min(na.omit(plotdf$value))), ceiling(max(na.omit(plotdf$value))), by = 0.25)
+    limits <- c(plyr::round_any(min(stats::na.omit(plotdf$value)), 0.5, f = floor), plyr::round_any(max(stats::na.omit(plotdf$value)), 0.5, f = ceiling))
+    breaks <- seq(floor(min(stats::na.omit(plotdf$value))), ceiling(max(stats::na.omit(plotdf$value))), by = 0.25)
 
     plot <- plot + ggplot2::scale_y_continuous(name = "",
                                        limits = limits,
                                        breaks = breaks,
                                        expand = c(0, 0))
   } else if(tsunit == "btoc | bgs") {
-    limits <- c(plyr::round_any(max(na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(na.omit(plotdf$value)), 0.5, f = floor))
-    breaks <- seq(ceiling(max(na.omit(plotdf$value))), floor(min(na.omit(plotdf$value))), by = 0.25)
+    limits <- c(plyr::round_any(max(stats::na.omit(plotdf$value)), 0.5, f = ceiling), plyr::round_any(min(stats::na.omit(plotdf$value)), 0.5, f = floor))
+    breaks <- seq(ceiling(max(stats::na.omit(plotdf$value))), floor(min(stats::na.omit(plotdf$value))), by = 0.25)
     plot <- plot + ggplot2::scale_y_reverse(name = paste0("Groundwater level (m ", tsunit, " )"),
                                        limits = limits,
                                        breaks = breaks,
@@ -180,7 +194,7 @@ YOWNplot_SiteCompare <- function(YOWNindex,
   caption <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last data entry)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
+    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(stats::na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(stats::na.omit(timeseries$timestamp_MST))), format = "%Y-%m-%d"), " (Date of last data entry)",  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                                       vjust = 0,
                                                       size = 9,

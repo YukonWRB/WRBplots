@@ -1,0 +1,3 @@
+This folder is divided into two subfolders. 
+Ashton Drew (KDV) and Jenn MacDonald (ECCC) worked with Ellorie to develop R script to build frequency plots for all parameters at all active sites for the Canada Yukon WQ Network. 
+R script is saved here, but other files and folders (such as the actual plots) are saved on the Water Resources Branch G Drive. Please contact WRB if you need those additional files and folders.

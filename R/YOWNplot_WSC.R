@@ -1,54 +1,66 @@
 #' YOWN-WSC comparative plot generation relative to a common datum
 #'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Plots YOWN data alongside WSC stations, in m asl. Only works for stations that have values in the "Elevation" field in their Aquarius information page.
 #'
-#' To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
-#' Marsh Lake: 09AB004
-#' Yukon River at Carmacks: 09AH001
+#' @details
+#' To store login credentials in your .renviron profile, call [usethis::edit_r_environ()] and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 #'
 #' @param YOWNindex Character vector of YOWN site IDs (eg. c("YOWN-2201S", "YOWN-2201D", "YOWN-2202"))
 #' @param WSCindex Character vector of WSC site IDs (eg. c("09AB004", "09AH001"))
-#' @param saveTo Location for data files to be saved. Default is publication to a new folder on your desktop.
-#' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
-#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
+#' @param title The title you wish to see on the plot as character vector.
+#' @param chartXInterval ????
+#' @param saveTo Location for data files to be saved as a character vector. Default "desktop" is to a new folder on your desktop; "choose" lets you interactively choose your save location.
+#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details. Passed to [WRBtools::aq_download()].
+#' @param server The URL for your organization's Aquarius web server. Default is for the Yukon Water Resources Branch. Passed to [WRBtools::aq_download()].
 #'
 #' @return Writes .pdf plot of WSC and YOWN data
 #'
 #' @export
 
+#TODO: Fill in documentation above
+
 YOWNplot_WSC <- function(YOWNindex,
                          WSCindex,
-                         saveTo = "desktop",
                          title = "YOWN wells vs. WSC Sites",
-                         chartXinterval = "1 month",
-                         login = Sys.getenv(c("AQUSER", "AQPASS"))) {
+                         chartXInterval = "1 month",
+                         saveTo = "desktop",
+                         login = Sys.getenv(c("AQUSER", "AQPASS")),
+                         server ="https://yukon.aquaticinformatics.net/AQUARIUS") {
 
 
-  YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
-  WSCindex = c("09AB004")
-  saveTo = "desktop"
-  title = "YOWN wells vs. WSC Sites"
-  chartXinterval = "1 month"
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  # YOWNindex = c("YOWN-2201S", "YOWN-2201D", "YOWN-2202", "YOWN-2203", "YOWN-2204", "YOWN-2205")
+  # WSCindex = c("09AB004")
+  # saveTo = "desktop"
+  # title = "YOWN wells vs. WSC Sites"
+  # chartXInterval = "1 month"
+  # login = Sys.getenv(c("AQUSER", "AQPASS"))
 
-
-
-  if(tolower(saveTo) == "desktop") {
-    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
-  }
-  if(dir.exists(saveTo) == FALSE) {
-    stop("Specified directory does not exist")
+  # Sort out save location
+  saveTo <- tolower(saveTo)
+  if (save_path %in% c("Choose", "choose")) {
+    print("Select the folder where you want this graph saved.")
+    save_path <- as.character(utils::choose.dir(caption="Select Save Folder"))
+  } else if(saveTo == "desktop") {
+    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop/")
+  } else if (dir.exists(saveTo) == FALSE) {
+    stop("Specified directory does not exist. Consider specifying save path as one of 'choose' or 'desktop'; refer to help file.")
   }
 
   # Download all YOWN data
   YOWNlist <- list()
   for(i in YOWNindex) {
 
+    #TODO confirm that this print is needed
     print(i)
 
     # Download data from Aquarius
     datalist <- suppressMessages(WRBtools::aq_download(loc_id = i,
-                                      ts_name = "Wlevel_masl.Calculated"))
+                                                       ts_name = "Wlevel_masl.Calculated",
+                                                       login = login,
+                                                       server = server))
 
     # Unlist time series data
     timeseries <- datalist$timeseries
@@ -136,7 +148,7 @@ YOWNplot_WSC <- function(YOWNindex,
 
   # Trim WSC data frame to time period of longest well record, as WSC records tend to be much longer
   plotdf_WSC <- plotdf_WSC %>%
-    dplyr::filter(timestamp_MST >= min(na.omit(plotdf_YOWN$timestamp_MST)))
+    dplyr::filter(timestamp_MST >= min(stats::na.omit(plotdf_YOWN$timestamp_MST)))
 
   # Create one massive data frame for chart parameter calculation
   fulldf <- dplyr::full_join(plotdf_YOWN, plotdf_WSC, by = c("ID", "timestamp_MST", "value"))
@@ -179,12 +191,12 @@ YOWNplot_WSC <- function(YOWNindex,
           legend.text = ggplot2::element_text(size = 9)) +
     ggplot2::scale_x_datetime(name = "",
                      limits = c(min(plotdf_YOWN$timestamp_MST), max(plotdf_YOWN$timestamp_MST)),
-                     date_breaks = chartXinterval,
+                     date_breaks = chartXInterval,
                      date_labels = "%m-%Y",
                      expand = c(0, 0)) +
     ggplot2::scale_y_continuous(name = "Water Level (m above sea level)",
-                       limits = c(plyr::round_any(min(na.omit(fulldf$value)), 0.5, f = floor), plyr::round_any(max(na.omit(fulldf$value)), 0.5, f = ceiling)),
-                       breaks = seq(plyr::round_any(min(na.omit(fulldf$value)), 0.5, f = floor), plyr::round_any(max(na.omit(fulldf$value)), 0.5, f = ceiling), by = 0.5),
+                       limits = c(plyr::round_any(min(stats::na.omit(fulldf$value)), 0.5, f = floor), plyr::round_any(max(stats::na.omit(fulldf$value)), 0.5, f = ceiling)),
+                       breaks = seq(plyr::round_any(min(stats::na.omit(fulldf$value)), 0.5, f = floor), plyr::round_any(max(stats::na.omit(fulldf$value)), 0.5, f = ceiling), by = 0.5),
                        expand = c(0, 0))
 
   title <- ggplot2::ggplot() +
@@ -201,7 +213,7 @@ YOWNplot_WSC <- function(YOWNindex,
   caption <- ggplot2::ggplot() +
     ggplot2::geom_blank() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(na.omit(plotdf_YOWN$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(na.omit(plotdf_YOWN$timestamp_MST))), format = "%Y-%m-%d"),  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
+    ggplot2::labs(title = paste0("Period of Record: ", strftime(as.POSIXct(min(stats::na.omit(plotdf_YOWN$timestamp_MST))), format = "%Y-%m-%d"), " to ", strftime(as.POSIXct(max(stats::na.omit(plotdf_YOWN$timestamp_MST))), format = "%Y-%m-%d"),  "\nPlot generated: ", Sys.Date(), "\nYukon Observation Well Network")) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0,
                                     vjust = 0,
                                     size = 9,

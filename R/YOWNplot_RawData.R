@@ -7,8 +7,8 @@
 #' @param AQID Identity of YOWN site in the following format: "YOWN-XXXX" or "YOWN-XXXXD"
 #' @param timeSeriesID Identity of the time series exactly as written in Aquarius (eg."Wlevel_bgs.Calculated")
 #' @param saveTo Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.
-#' @param AQTSServerID Defaults to Yukon Water Resources Branch Aquarius web server
-#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.
+#' @param login Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details. Passed to [WRBtools::aq_download()].
+#' @param server The URL for your organization's Aquarius web server. Default is for the Yukon Water Resources Branch. Passed to [WRBtools::aq_download()].
 #'
 #' @return Writes .pdf of the full period of record for a specified YOWN site and time series ID, as well as a .csv containing all the raw data and copies a grade key to interpret data grading
 #' @export
@@ -16,8 +16,8 @@
 YOWNplot_RawData <- function(AQID,
                              timeSeriesID="Wlevel_bgs.Calculated",
                              saveTo = "desktop",
-                             AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS",
-                             login = Sys.getenv(c("AQUSER", "AQPASS")))
+                             login = Sys.getenv(c("AQUSER", "AQPASS")),
+                             server ="https://yukon.aquaticinformatics.net/AQUARIUS")
 {
 
   # AQID = "YOWN-1901"
@@ -27,17 +27,23 @@ YOWNplot_RawData <- function(AQID,
   # login = Sys.getenv(c("AQUSER", "AQPASS"))
   # AQTSServerID ="https://yukon.aquaticinformatics.net/AQUARIUS"
 
-  if(tolower(saveTo) == "desktop") {
-    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop")
-  }
-  if(dir.exists(saveTo) == FALSE) {
-    stop("Specified directory does not exist")
+  # Sort out save location
+  saveTo <- tolower(saveTo)
+  if (save_path %in% c("Choose", "choose")) {
+    print("Select the folder where you want this graph saved.")
+    save_path <- as.character(utils::choose.dir(caption="Select Save Folder"))
+  } else if(saveTo == "desktop") {
+    saveTo <- paste0("C:/Users/", Sys.getenv("USERNAME"), "/Desktop/")
+  } else if (dir.exists(saveTo) == FALSE) {
+    stop("Specified directory does not exist. Consider specifying save path as one of 'choose' or 'desktop'; refer to help file.")
   }
 
   # Download data from Aquarius
   timeRange = c("00:00:00", "23:59:59")
   datalist <- suppressMessages(WRBtools::aq_download(loc_id = AQID,
-                                                     ts_name = "Wlevel_bgs.Calculated"))
+                                                     ts_name = "Wlevel_bgs.Calculated",
+                                                     login = login,
+                                                     server = server))
 
   # Unlist time series data
   timeseries <- datalist$timeseries
@@ -88,7 +94,7 @@ YOWNplot_RawData <- function(AQID,
   dir.create(paste0(saveTo, "/", AQID), showWarnings = FALSE)
 
   # Prepare and write time series and grading csv exports
-  write.csv(x = rawdf,
+  utils::write.csv(x = rawdf,
             file = paste0(saveTo, "/", AQID, "/", AQID, "_FullRecord", ".csv"),
             row.names = FALSE)
 

@@ -8,8 +8,8 @@ YOWNplot_RawData(
   AQID,
   timeSeriesID = "Wlevel_bgs.Calculated",
   saveTo = "desktop",
-  AQTSServerID = "https://yukon.aquaticinformatics.net/AQUARIUS",
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  login = Sys.getenv(c("AQUSER", "AQPASS")),
+  server = "https://yukon.aquaticinformatics.net/AQUARIUS"
 )
 }
 \arguments{
@@ -19,9 +19,9 @@ YOWNplot_RawData(
 
 \item{saveTo}{Location for data files to be saved. Will create directory if it doesn't exist. Defaults to user's desktop.}
 
-\item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
+\item{login}{Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details. Passed to \code{\link[WRBtools:aq_download]{WRBtools::aq_download()}}.}
 
-\item{login}{Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.}
+\item{server}{The URL for your organization's Aquarius web server. Default is for the Yukon Water Resources Branch. Passed to \code{\link[WRBtools:aq_download]{WRBtools::aq_download()}}.}
 }
 \value{
 Writes .pdf of the full period of record for a specified YOWN site and time series ID, as well as a .csv containing all the raw data and copies a grade key to interpret data grading

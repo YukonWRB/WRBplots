@@ -7,10 +7,11 @@
 YOWNplot_WSC(
   YOWNindex,
   WSCindex,
-  saveTo = "desktop",
   title = "YOWN wells vs. WSC Sites",
-  chartXinterval = "1 month",
-  login = Sys.getenv(c("AQUSER", "AQPASS"))
+  chartXInterval = "1 month",
+  saveTo = "desktop",
+  login = Sys.getenv(c("AQUSER", "AQPASS")),
+  server = "https://yukon.aquaticinformatics.net/AQUARIUS"
 )
 }
 \arguments{
@@ -18,20 +19,24 @@ YOWNplot_WSC(
 
 \item{WSCindex}{Character vector of WSC site IDs (eg. c("09AB004", "09AH001"))}
 
-\item{saveTo}{Location for data files to be saved. Default is publication to a new folder on your desktop.}
+\item{title}{The title you wish to see on the plot as character vector.}
 
-\item{login}{Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details.}
+\item{chartXInterval}{????}
 
-\item{AQTSServerID}{Defaults to Yukon Water Resources Branch Aquarius web server}
+\item{saveTo}{Location for data files to be saved as a character vector. Default "desktop" is to a new folder on your desktop; "choose" lets you interactively choose your save location.}
+
+\item{login}{Your Aquarius login credentials as a character vector of two (eg. c("cmfische", "password") Default pulls information from your .renviron profile; see details. Passed to \code{\link[WRBtools:aq_download]{WRBtools::aq_download()}}.}
+
+\item{server}{The URL for your organization's Aquarius web server. Default is for the Yukon Water Resources Branch. Passed to \code{\link[WRBtools:aq_download]{WRBtools::aq_download()}}.}
 }
 \value{
 Writes .pdf plot of WSC and YOWN data
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Plots YOWN data alongside WSC stations, in m asl. Only works for stations that have values in the "Elevation" field in their Aquarius information page.
 }
 \details{
-To store login credentials in your .renviron profile, call usethis::edit_r_environ() and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
-Marsh Lake: 09AB004
-Yukon River at Carmacks: 09AH001
+To store login credentials in your .renviron profile, call \code{\link[usethis:edit]{usethis::edit_r_environ()}} and enter your username and password as value pairs, as AQUSER="your username" and AQPASS = "your password".
 }
