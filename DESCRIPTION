@@ -1,6 +1,6 @@
 Package: WRBplots
 Title: Make pretty, standard plots for a variety of WRB uses
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: 
     c(person("Cole", "Fischer", , "cole.fischer@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7266-5760")),

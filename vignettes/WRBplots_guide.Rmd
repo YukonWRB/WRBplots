@@ -1,0 +1,43 @@
+---
+title: "WRBplots User Guide"
+author: "Ghislain de Laplante"
+date: "2023-05-31"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{WRBplots}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(WRBfloods)
+```
+
+```{r vignette building comments, eval=FALSE, include=FALSE}
+# You should be modifying this vignette from the .Rmd document in the /vignettes folder, NOT the .RMD in the /doc folder.
+# To have this vignette updated on the G drive, uncomment and run the following code *after* re-building the vignette using devtools::build_vignettes()
+# file.copy(from = paste0(dirname(getwd()), "/doc/WRBplots_guide.html"), to = "//env-fs/env-data/corp/water/Common_GW_SW/R-packages/WRBplots/WRBplots user guide.html", overwrite = TRUE)
+```
+
+Important note regarding this vignette: if you are reading this in an HTML, Word or PDF document from the package folder on the G drive and wish to update the document, please do so via the vignette R Markdown document and re-publish/overwrite the document. The R Markdown document should be the ultimate source of truth regarding this R package. Instructions on how to do so are provided in the vignette Markdown document.
+
+This vignette may also come to contain R code and links to other documentation. For best performance and to ensure that all links function, it is recommended to view this vignette from within R Studio. You can view all package vignettes with 'vignette(package = "WRBplots")' or this particular vignette with 'vignette(topic = "WRBplots_guide")'. Note however that vignettes may not have been installed, depending on the method you used to install the package.
+
+
+# Introduction
+
+This package exists to hold a variety of custom plotting functions use by the Yukon Water Resources Branch. Keeping plotting functions in a package facilitates keeping track of the various plots that we can generate, facilitates the development of new plotting functions, and reduces the potential for redundancy and "lost" scripts. In addition, the package structure and installation process ensures that dependencies are up-to-date for all users (at least at the time of installation!) and keep plotting function within the WRB package "ecosystem".
+
+# Getting started with the WRBplots package
+
+## Installing the package
+
+The latest version of the package can be installed from the GitHub repository YukonWRB/WRBplots. Previous versions are kept in the Water Resources Branch G drive, in Common_GW_SW/R-packages/WRBplots
+
+## Updating package dependencies
+
+This package depends on several other packages to execute its code. Please ensure that any packages required for the function of WRBplots are up to date when you install, re-install, or update WRBplots Note that not all packages can be updated from an active RStudio session, and that you may need to perform updates using the basic R interface; at the same time you should ensure that your version of R is up to date. A convenient package exists to perform both of these tasks at once: the [installr](https://www.rdocumentation.org/packages/installr/versions/0.23.2) package.
