@@ -20,7 +20,7 @@ library(WRBfloods)
 ```{r vignette building comments, eval=FALSE, include=FALSE}
 # You should be modifying this vignette from the .Rmd document in the /vignettes folder, NOT the .RMD in the /doc folder.
 # To have this vignette updated on the G drive, uncomment and run the following code *after* re-building the vignette using devtools::build_vignettes()
-# file.copy(from = paste0(dirname(getwd()), "/doc/WRBplots_guide.html"), to = "//env-fs/env-data/corp/water/Common_GW_SW/R-packages/WRBplots/WRBplots user guide.html", overwrite = TRUE)
+# file.copy(from = paste0(dirname(getwd()), "/doc/WRBplots_guide.html"), to = "//env-fs/env-data/corp/water/Common_GW_SW/R-packages/WRBplots/documentation/WRBplots user guide.html", overwrite = TRUE)
 ```
 
 Important note regarding this vignette: if you are reading this in an HTML, Word or PDF document from the package folder on the G drive and wish to update the document, please do so via the vignette R Markdown document and re-publish/overwrite the document. The R Markdown document should be the ultimate source of truth regarding this R package. Instructions on how to do so are provided in the vignette Markdown document.
