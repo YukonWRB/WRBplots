@@ -38,7 +38,7 @@ hydrometDiscrete <- function(location,
                              dbPath = "default")
 {
   # Commented code below is for testing...
-  # location = "09AA-SC03"
+  # location = "08AA-SC02"
   # parameter = "SWE"
   # startDay = 1
   # endDay = 365
@@ -188,7 +188,7 @@ hydrometDiscrete <- function(location,
     ggplot2::theme(legend.position = "right", legend.justification = c(0, 0.95), legend.text = ggplot2::element_text(size = 8*plot_scale), legend.title = ggplot2::element_text(size = 10*plot_scale), axis.title.y = ggplot2::element_text(size = 12*plot_scale), axis.text.x = ggplot2::element_text(size = 9*plot_scale), axis.text.y = ggplot2::element_text(size = 9*plot_scale))
   if (plot_type == "violin") {
     plot <- plot +
-      ggplot2::geom_violin(draw_quantiles = c(0.5), adjust = 0.7, width = 15, alpha = 0.8, fill = "aliceblue")
+      ggplot2::geom_violin(draw_quantiles = c(0.5), adjust = 0.7, width = 12, alpha = 0.8, fill = "aliceblue", scale = "width") #Using a scale other than "width" may result in issues for locations where there are many "0" values.
   } else if (plot_type == "boxplot"){
     plot <- plot +
       ggplot2::geom_boxplot(outlier.shape = 8 , outlier.size = 1.7*plot_scale, color = "black", fill = "aliceblue", varwidth = TRUE)
