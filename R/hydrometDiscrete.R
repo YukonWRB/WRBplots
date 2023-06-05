@@ -38,12 +38,12 @@ hydrometDiscrete <- function(location,
                              dbPath = "default")
 {
   # Commented code below is for testing...
-  # location = "08AA-SC02"
+  # location = "08AA-SC01"
   # parameter = "SWE"
   # startDay = 1
   # endDay = 365
   # tzone = "MST"
-  # years = c(2019,2020,2021,2022,2023)
+  # years = c(2023)
   # title = TRUE
   # plot_scale = 1
   # plot_type = "violin"
