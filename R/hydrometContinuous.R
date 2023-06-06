@@ -60,7 +60,7 @@ hydrometContinuous <- function(location,
 {
 
   # Commented code below is for testing...
-  # location = "09EA004"
+  # location = "09AA-M1"
   # parameter = "level"
   # startDay = 1
   # endDay = 365
