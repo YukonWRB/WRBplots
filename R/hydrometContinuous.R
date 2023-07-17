@@ -60,21 +60,21 @@ hydrometContinuous <- function(location,
 {
 
   # Commented code below is for testing...
-  # location = "09AA-M1"
-  # parameter = "level"
-  # startDay = 1
-  # endDay = 365
+  # location = "09EA004"
+  # parameter = "flow"
+  # startDay = "2022-09-01"
+  # endDay = "2022-10-01"
   # tzone = "MST"
-  # years = c(2021,2022,2020)
+  # years = c(2022)
   # datum = TRUE
   # title = TRUE
   # returns = "calculate"
   # return_type = "max"
-  # return_months = c(5,6,7,8,9)
+  # return_months = c(9,10)
   # allowed_missing = 10
   # plot_scale = 1
   # save_path = NULL
-  # dbPath = "default"
+  # dbPath <- "C:/Users/g_del/Documents/R/KlondikeLandslides/data/hydro.sqlite"
 
   # Checks on input parameters  and other start-up bits------------------
   if (parameter != "SWE"){
@@ -275,7 +275,7 @@ hydrometContinuous <- function(location,
     temp$day = lubridate::day(temp$date)
     temp$day <- stringr::str_pad(temp$day, 2, side = "left", pad = "0")
 
-    #Column md is build in both temp and realtime dfs to be able to differentiate the previous year from the next and assign proper plot years (i.e. 2022-2023) and fake datetimes (since every year needs the same "fake year" to plot together)
+    #Column md is built in both temp and realtime dfs to be able to differentiate the previous year from the next and assign proper plot years (i.e. 2022-2023) and fake datetimes (since every year needs the same "fake year" to plot together)
     temp$md <- paste0(temp$month, temp$day)
     temp$md <- as.numeric(temp$md)
     md_sequence <- seq(min(temp$md), max(temp$md))
@@ -287,12 +287,16 @@ hydrometContinuous <- function(location,
     realtime$fake_datetime <- as.POSIXct(rep(NA, nrow(realtime)))
     realtime$plot_year <- NA
     for (i in 1:nrow(realtime)){  #!!!This desperately needs to be vectorized in some way. Super slow!
-      realtime$fake_datetime[i] <- as.POSIXct(gsub("[0-9]{4}", if (realtime$md[i] %in% md_sequence) last_year else last_year + 1, realtime$datetime_UTC[i]), tz = tzone)
+      fake_datetime <- gsub("[0-9]{4}", if (realtime$md[i] %in% md_sequence) last_year else last_year + 1, realtime$datetime_UTC[i])
+      fake_datetime <- ifelse(nchar(fake_datetime) > 11, fake_datetime, paste0(fake_datetime, " 00:00:00"))
+      realtime$fake_datetime[i] <- as.POSIXct(fake_datetime, tz = tzone)
       realtime$plot_year[i] <- if (realtime$md[i] %in% md_sequence) paste0(realtime$year[i], "-", realtime$year[i] +1) else paste0(realtime$year[i] -1, "-", realtime$year[i])
     }
   } else { #Does not overlap the new year
     realtime$plot_year <- as.character(realtime$year)
-    realtime$fake_datetime <- as.POSIXct(gsub("[0-9]{4}", last_year, realtime$datetime_UTC), tz = tzone) #Make fake datetimes to permit plotting years together as separate lines. This DOESN'T work if Feb 29 isn't removed first!
+    realtime$fake_datetime <- gsub("[0-9]{4}", last_year, realtime$datetime_UTC)
+    realtime$fake_datetime <- ifelse(nchar(realtime$fake_datetime) > 11, realtime$fake_datetime, paste0(realtime$fake_datetime, " 00:00:00"))
+    realtime$fake_datetime <- as.POSIXct(realtime$fake_datetime, tz = tzone, format='%Y-%m-%d %H:%M:%S') #Make fake datetimes to permit plotting years together as separate lines. This DOESN'T work if Feb 29 isn't removed first!
   }
 
   # apply datum correction where necessary
