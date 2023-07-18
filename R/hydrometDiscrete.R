@@ -38,19 +38,28 @@ hydrometDiscrete <- function(location,
                              dbPath = "default")
 {
   # Commented code below is for testing...
-  # location = "08AA-SC01"
+  # location = "09EA-M1"
   # parameter = "SWE"
   # startDay = 1
   # endDay = 365
   # tzone = "MST"
-  # years = c(2023)
+  # years = c(2022)
   # title = TRUE
   # plot_scale = 1
-  # plot_type = "violin"
+  # plot_type = "boxplot"
   # save_path = NULL
-  # dbPath = "default"
+  # dbPath = "C:/Users/g_del/Documents/R/KlondikeLandslides/data/hydro.sqlite"
 
   #TODO Should give a decent error message if the user requests something that doesn't exist. Station not existing, timeseries not existing, years not available (and where they are), etc.
+
+  if (startDay != 1){
+    startDay <- 1
+    message("Parameter startDay is not currently in use and has been reset to the default of 1.")
+  }
+  if (endDay != 365){
+    endDay <- 365
+    message("Parameter endDay is not currently in use and has been reset to the default of 365.")
+  }
 
   # Checks on input parameters  and other start-up bits------------------
   if (parameter != "SWE"){
@@ -112,7 +121,6 @@ hydrometDiscrete <- function(location,
         endDay <<- endDay + 1
       }
     }
-    # if (tempStartDay > endDay){
     endDay <<- as.POSIXct(as.numeric(endDay)*60*60*24, origin = paste0(last_year-1, "-12-31 23:59:59"), tz = "UTC")
     endDay <<- lubridate::force_tz(endDay, tzone)
   })
@@ -122,44 +130,36 @@ hydrometDiscrete <- function(location,
   } else {
     overlaps <- FALSE
   }
+
   day_seq <- seq.POSIXt(startDay, endDay, by = "day")
 
-  if (is.null(years)){
-    years <- as.numeric(substr(Sys.Date(), 1, 4))
-    years <- sort(years, decreasing = TRUE)
-  } else {
-    years <- as.numeric(years)
-    if (length(years) > 10){
-      years <- years[1:10]
-      print("The parameter 'years' can only have up to 10 years. It's been truncated to the first 10 years in the vector.")
-    }
-  }
-  # Select save path
-  if (!is.null(save_path)){
-    if (save_path %in% c("Choose", "choose")) {
-      print("Select the folder where you want this graph saved.")
-      save_path <- as.character(utils::choose.dir(caption="Select Save Folder"))
-    }
+  #Check for existence of timeseries, then for presence of data within the time range requested.
+  exists <- DBI::dbGetQuery(con, paste0("SELECT * FROM timeseries WHERE location = '", location, "' AND parameter = '", parameter, "' AND type = 'discrete'"))
+  if (nrow(exists) == 0){
+    stop("There is no entry for the location and parameter combination that you specified of discrete data type. If you are trying to graph continuous data use hydrometContinuous.")
+  } else if (nrow(exists) > 1){
+    stop("There is more than one entry in the database for the location and parameter that you specified! Please alert the database manager ASAP.")
   }
 
-  #Connect
-  con <- WRBtools::hydroConnect(path = dbPath, silent = TRUE)
-  on.exit(DBI::dbDisconnect(con))
+
 
   #Find the ts units
   units <- DBI::dbGetQuery(con, paste0("SELECT units FROM timeseries WHERE parameter = '", parameter, "' AND location = '", location, "'"))
 
   # Get the data ---------------------
   all_discrete <- DBI::dbGetQuery(con, paste0("SELECT * FROM discrete WHERE location = '", location, "' AND parameter = '", parameter, "' AND sample_date < '", paste0(max(years), substr(endDay, 5, 10)), "'"))
+  if (nrow(all_discrete) == 0){
+    stop(paste0("There doesn't appear to be any data for the year and days you specified: this timeseries starts ",  exists$start_datetime_UTC))
+  }
   all_discrete$target_date <- as.Date(all_discrete$target_date)
   all_discrete$sample_date <- as.Date(all_discrete$sample_date)
   all_discrete$year <- lubridate::year(all_discrete$target_date)
   all_discrete$month <- lubridate::month(all_discrete$target_date)
   all_discrete$day <- lubridate::day(all_discrete$target_date)
   #Separate, modify, and re-bind feb29 days, if any
-  feb29 <- all_discrete[all_discrete$month == 2 & all_discrete$day == 29 ,]
+  feb29 <- all_discrete[all_discrete$month == 2 & all_discrete$day == 29, ]
   if (nrow(feb29) > 0){
-    all_discrete <- all_discrete[!(all_discrete$month == 2 & all_discrete$day == 29) ,]
+    all_discrete <- all_discrete[!(all_discrete$month == 2 & all_discrete$day == 29), ]
     feb29$target_date <- feb29$target_date + 1
     feb29$month <- 3
     feb29$day <- 1
@@ -177,7 +177,9 @@ hydrometDiscrete <- function(location,
     new_discrete <- all_discrete[all_discrete$target_date >= start & all_discrete$target_date <= end , ]
     discrete <- rbind(discrete, new_discrete)
   }
-
+  if (nrow(discrete) == 0){
+    stop("There is no data to graph after filtering for your specified year(s) and day range. Try again with different days.")
+  }
 
   #Make the plot --------------------
   colours = c("blue", "black", "darkorchid3", "cyan2", "firebrick3", "aquamarine4", "gold1", "chartreuse1", "darkorange", "lightsalmon4")
