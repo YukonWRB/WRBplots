@@ -16,7 +16,7 @@
 #' When requesting time periods where high-frequency (realtime) data is available, some of the data may be displayed as daily means instead to improve performance. Specifically, only day ranges of less than 60 days will have high-frequency data (61 days or more will be plotted with daily means). Additionally, daily means will be fetched once the number of high-frequency rows exceeds 20 000 after year specified under parameter `years` (this will plot up to two 60-day lines at 5 minute recording intervals). In all cases, high-frequency data will be fetched nearest to the specified `endDate`.
 #'
 #' ## Return periods:
-#' Return periods generated using the "calculate" option are calculated using all available data up to and including the most recent plotted data. Extreme values are isolated for each year and passed to [fasstr::compute_frequency_analysis()] using a Log Pearson Type 3 distribution and the method of moments to fit a curve to the distribution. Years (or rather periods within years; see below) missing more than the percentage of data specified in `allowed_missing` are excluded from consideration.
+#' Return periods generated using the "calculate" option are calculated using all available after applying the parameter `return_max_year`. Extreme values are isolated for each year and passed to [fasstr::compute_frequency_analysis()] using a Log Pearson Type 3 distribution and the method of moments to fit a curve to the distribution. Years (or rather periods within years; see below) missing more than the percentage of data specified in `allowed_missing` are excluded from consideration.
 #'
 #' As the time of year during which minimum or maximum values happen is variable and to prevent filtering out years that are missing irrelevant data (most rivers peak in spring, some peak in late summer, snow pack peaks in winter), the parameters return_months and allowed_missing should be carefully selected. This may require you to make a graph first to evaluate when the annual min/max of interest happens. Consider as well that you can ask for return periods specific for a month or season, such as return periods of minimum flows in September, or maximum flows in January. This also applies to levels or any other continuous parameter which this function can plot.
 #'
@@ -32,7 +32,8 @@
 #' @param title Should a title be included?
 #' @param returns Should returns be plotted? You have the option of using pre-determined level returns only (option "table"), auto-calculated values(option "calculate"), "auto" (priority to "table", fallback to "calculate"), or "none". Defaults to "auto".
 #' @param return_type Use minimum ("min") or maximum ("max") values for returns?
-#' @param return_months Numeric vector of months during which to look for minimum or maximum values. Only works with calculated returns. Does not have to be within `startDay` and `endDay`, but will only consider data up to the last year specified in `years`. For months overlapping the new year like November-April, should look like c(11:12,1:4). IMPORTANT: the first month in the range should be the first element of the vector: c(1:4, 11:12) would not be acceptable. Think of it as defining a season. Passed to 'months' argument of [fasstr::calc_annual_extremes()] and also used to set the 'water_year_start' parameter.
+#' @param return_months Numeric vector of months during which to look for minimum or maximum values. Only works with calculated returns. Does not have to be within `startDay` and `endDay`, but will only consider data up to the last year specified in `years`. For months overlapping the new year like November-April, should look like c(11:12,1:4). IMPORTANT: the first month in the range should be the first element of the vector: c(1:4, 11:12) would not be acceptable. Think of it as defining a season. Passed to 'months' argument of [fasstr::calc_annual_extremes()] and also used to set the 'water_year_start' parameter of this function.
+#' @param return_max_year The last year of data to consider when calculating returns. Default uses all years *prior to* the last year plotted, giving historical context. Cannot be greater than the last year plotted but can be earlier than the first.
 #' @param allowed_missing Allowable % of data missing during the months specified in 'return_months' to still retain the year for analysis when calculating returns. Passed to 'allowed_missing' argument of [fasstr::calc_annual_extremes()].
 #' @param plot_scale Adjusts/scales the size of plot text elements. 1 = standard size, 0.5 = half size, 2 = double the size, etc. Standard size works well in a typical RStudio environment.
 #' @param save_path Default is NULL and the graph will be visible in RStudio and can be assigned to an object. Option "choose" brings up the File Explorer for you to choose where to save the file, or you can also specify a save path directly.
@@ -53,6 +54,7 @@ hydrometContinuous <- function(location,
                                returns = "auto",
                                return_type = "max",
                                return_months = c(5:9),
+                               return_max_year = max(years)-1,
                                allowed_missing = 10,
                                plot_scale = 1,
                                save_path = NULL,
@@ -71,6 +73,7 @@ hydrometContinuous <- function(location,
   # returns = "calculate"
   # return_type = "max"
   # return_months = c(9,10)
+  # return_max_year = max(years)-1
   # allowed_missing = 10
   # plot_scale = 1
   # save_path = NULL
@@ -102,6 +105,11 @@ hydrometContinuous <- function(location,
       print("Select the folder where you want this graph saved.")
       save_path <- as.character(utils::choose.dir(caption="Select Save Folder"))
     }
+  }
+
+  if (return_max_year > max(years)){
+    return_max_years <- max(years)
+    message("Your parameter entry for 'return_max_years' is invalid (greater than the last year plotted). It has been adjusted to the last year plotted, or to the last year with enough data.")
   }
 
   #Connect
@@ -190,10 +198,10 @@ hydrometContinuous <- function(location,
     }
     end_UTC <- end
     attr(end_UTC, "tzone") <- "UTC"
-    if (length(day_seq) < 60){
-      if (nrow(realtime) < 10000){
+    if (length(day_seq) < 90){
+      if (nrow(realtime) < 20000){
         new_realtime <- DBI::dbGetQuery(con, paste0("SELECT * FROM realtime WHERE location = '", location, "' AND parameter = '", parameter, "' AND datetime_UTC BETWEEN '", as.character(start_UTC), "' AND '", as.character(end_UTC), "'")) #SQL BETWEEN is inclusive
-        new_realtime <- utils::tail(new_realtime, 20000) #Retain only max 20000 data points for plotting performance
+        new_realtime <- utils::tail(new_realtime, 30000) #Retain only max 20000 data points for plotting performance
         new_realtime$datetime_UTC <- as.POSIXct(new_realtime$datetime_UTC, tz = "UTC") #Comes out of the DB as.character, so convert
         attr(new_realtime$datetime_UTC, "tzone") <- tzone
         realtime <- realtime[!is.na(realtime$value) , ] #remove empty data points, if any exist. These are later filled with NAs (1 per day) so the lines don't go across.
@@ -226,6 +234,9 @@ hydrometContinuous <- function(location,
         realtime <- rbind(realtime, row)
       }
     }
+  }
+  if (nrow(realtime) == 0){
+    stop("There is no data to plot within this range of years and days.")
   }
   #Add the ribbon values for the times between startDay and endDay
   ribbon <- data.frame()
@@ -354,7 +365,6 @@ hydrometContinuous <- function(location,
 
   plot <- plot +
     ggplot2::geom_line(ggplot2::aes(colour = as.factor(plot_year), group = as.factor(plot_year)), linewidth = line_size, na.rm = T) +
-    # ggplot2::geom_line(data = realtime[, c("fake_datetime", "value", "plot_year")], ggplot2::aes(x=fake_datetime, y = value), colour = as.factor(plot_year))+
     ggplot2::scale_colour_manual(name = "Year", labels = rev(unique(realtime$plot_year)), values = colours[1:legend_length], na.translate = FALSE, breaks=rev(unique(realtime$plot_year)))
 
 
@@ -387,7 +397,7 @@ hydrometContinuous <- function(location,
     }
     if (returns == "calculate"){
       tryCatch({
-        extremes <- suppressWarnings(fasstr::calc_annual_extremes(daily, dates = datetime_UTC, values = value, water_year_start = return_months[1], months = return_months, allowed_missing = allowed_missing))
+        extremes <- suppressWarnings(fasstr::calc_annual_extremes(daily[daily$year <= return_max_year , ], dates = datetime_UTC, values = value, water_year_start = return_months[1], months = return_months, allowed_missing = allowed_missing))
         extremes$Measure <- "1-Day"
         if (return_type == "max"){
           analysis <- fasstr::compute_frequency_analysis(data = extremes, events = Year, values = "Max_1_Day", use_max = TRUE, fit_quantiles = c(0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005))
