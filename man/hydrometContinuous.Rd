@@ -16,6 +16,7 @@ hydrometContinuous(
   returns = "auto",
   return_type = "max",
   return_months = c(5:9),
+  return_max_year = max(years) - 1,
   allowed_missing = 10,
   plot_scale = 1,
   save_path = NULL,
@@ -43,7 +44,9 @@ hydrometContinuous(
 
 \item{return_type}{Use minimum ("min") or maximum ("max") values for returns?}
 
-\item{return_months}{Numeric vector of months during which to look for minimum or maximum values. Only works with calculated returns. Does not have to be within \code{startDay} and \code{endDay}, but will only consider data up to the last year specified in \code{years}. For months overlapping the new year like November-April, should look like c(11:12,1:4). IMPORTANT: the first month in the range should be the first element of the vector: c(1:4, 11:12) would not be acceptable. Think of it as defining a season. Passed to 'months' argument of \code{\link[fasstr:calc_annual_extremes]{fasstr::calc_annual_extremes()}} and also used to set the 'water_year_start' parameter.}
+\item{return_months}{Numeric vector of months during which to look for minimum or maximum values. Only works with calculated returns. Does not have to be within \code{startDay} and \code{endDay}, but will only consider data up to the last year specified in \code{years}. For months overlapping the new year like November-April, should look like c(11:12,1:4). IMPORTANT: the first month in the range should be the first element of the vector: c(1:4, 11:12) would not be acceptable. Think of it as defining a season. Passed to 'months' argument of \code{\link[fasstr:calc_annual_extremes]{fasstr::calc_annual_extremes()}} and also used to set the 'water_year_start' parameter of this function.}
+
+\item{return_max_year}{The last year of data to consider when calculating returns. Default uses all years \emph{prior to} the last year plotted, giving historical context. Cannot be greater than the last year plotted but can be earlier than the first.}
 
 \item{allowed_missing}{Allowable \% of data missing during the months specified in 'return_months' to still retain the year for analysis when calculating returns. Passed to 'allowed_missing' argument of \code{\link[fasstr:calc_annual_extremes]{fasstr::calc_annual_extremes()}}.}
 
@@ -74,7 +77,7 @@ When requesting time periods where high-frequency (realtime) data is available, 
 
 \subsection{Return periods:}{
 
-Return periods generated using the "calculate" option are calculated using all available data up to and including the most recent plotted data. Extreme values are isolated for each year and passed to \code{\link[fasstr:compute_frequency_analysis]{fasstr::compute_frequency_analysis()}} using a Log Pearson Type 3 distribution and the method of moments to fit a curve to the distribution. Years (or rather periods within years; see below) missing more than the percentage of data specified in \code{allowed_missing} are excluded from consideration.
+Return periods generated using the "calculate" option are calculated using all available after applying the parameter \code{return_max_year}. Extreme values are isolated for each year and passed to \code{\link[fasstr:compute_frequency_analysis]{fasstr::compute_frequency_analysis()}} using a Log Pearson Type 3 distribution and the method of moments to fit a curve to the distribution. Years (or rather periods within years; see below) missing more than the percentage of data specified in \code{allowed_missing} are excluded from consideration.
 
 As the time of year during which minimum or maximum values happen is variable and to prevent filtering out years that are missing irrelevant data (most rivers peak in spring, some peak in late summer, snow pack peaks in winter), the parameters return_months and allowed_missing should be carefully selected. This may require you to make a graph first to evaluate when the annual min/max of interest happens. Consider as well that you can ask for return periods specific for a month or season, such as return periods of minimum flows in September, or maximum flows in January. This also applies to levels or any other continuous parameter which this function can plot.
 
