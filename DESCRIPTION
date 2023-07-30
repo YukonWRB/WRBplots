@@ -1,12 +1,13 @@
 Package: WRBplots
 Title: Make pretty, standardized plots for a variety of WRB uses
 Version: 1.2.3
+Date: 2023-07-29
 Authors@R: 
     c(person("Cole", "Fischer", , "cole.fischer@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7266-5760")),
     person("Ghislain", "de Laplante", , "ghislaindel@gmail.com", role = c("aut"),
            comment = c(ORCID = "0000-0002-5093-9185")))
-Description: Functions that facilitate the generation of custom plots from several different data sources. Currently set up to work with data directly from Aquarius and from the local hydrometric database.
+Description: Functions that facilitate the generation of custom plots from several different data sources in a consistent format.
 License: AGPL (>= 3) + file LICENSE
 Depends: 
     R (>= 2.10)

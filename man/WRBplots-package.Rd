@@ -4,9 +4,9 @@
 \name{WRBplots-package}
 \alias{WRBplots}
 \alias{WRBplots-package}
-\title{WRBplots: Make pretty, standard plots for a variety of WRB uses}
+\title{WRBplots: Make pretty, standardized plots for a variety of WRB uses}
 \description{
-Functions that facilitate the generation of custom plots from several different data sources. Currently set up to work with data directly from Aquarius and from the local hydrometric database.
+Functions that facilitate the generation of custom plots from several different data sources in a consistent format.
 }
 \seealso{
 Useful links:
