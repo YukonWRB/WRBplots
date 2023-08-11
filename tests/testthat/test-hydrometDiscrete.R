@@ -1,5 +1,6 @@
 #NOTE: as of June 2023 hydrometDiscrete does not accept start/end dates other than 1 and 365. This explained in the help file.
 
+
 test_that("violin plot is as expected for full year with numeric startDay and endDay", {
   dir <- paste0(tempdir(), "/plot")
   dir.create(dir)
@@ -63,6 +64,25 @@ test_that("depth plots work", {
   path <- list.files(dir, full.names=TRUE)
   file.rename(path, paste0(dir, "/snow6.png"))
   expect_snapshot_file(paste0(dir, "/snow6.png"))
+  unlink(dir, recursive=TRUE)
+})
+
+test_that("violin plot is as expected when discrete data is given", {
+  dir <- paste0(tempdir(), "/plot")
+  dir.create(dir)
+  unlink(dir, recursive=TRUE)
+  # Run swe_basin to get discrete_data
+  discrete_data <- suppressWarnings(WRBfloods::SWE_basin(year=2022,
+                                        month=c(3,4,5),
+                                        threshold = 6,
+                                        csv = FALSE,
+                                        summarise = FALSE))
+  discrete_data <- discrete_data %>% dplyr::filter(location=="Upper_Yukon")
+  # use discrete data in hydrometDiscrete
+  suppressWarnings(hydrometDiscrete(location=NULL, parameter='SWE', years=c(2021, 2022), title=TRUE, plot_type = "boxplot", save_path = dir, discrete_data = discrete_data))
+  path <- list.files(dir, full.names=TRUE)
+  file.rename(path, paste0(dir, "/snow7.png"))
+  expect_snapshot_file(paste0(dir, "/snow7.png"))
   unlink(dir, recursive=TRUE)
 })
 

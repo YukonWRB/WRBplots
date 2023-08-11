@@ -20,12 +20,13 @@
 #' @param plot_scale Adjusts/scales the size of plot text elements. 1 = standard size, 0.5 = half size, 2 = double the size, etc. Standard size works well in a typical RStudio environment.
 #' @param save_path Default is NULL and the graph will be visible in RStudio and can be assigned to an object. Option "choose" brings up the File Explorer for you to choose where to save the file, or you can also specify a save path directly.
 #' @param dbPath The path to the local hydromet database, passed to [hydroConnect()].
-#'
+#' @param discrete_data A dataframe with the data to be plotted. Must contain the following columns: year, month, value and units.
 #' @return A .png file of the plot requested (if a save path has been selected), plus the plot displayed in RStudio. Assign the function to a variable to also get a plot in your global environment as a ggplot object which can be further modified
 #' @export
-#'
 
-hydrometDiscrete <- function(location,
+# hydrometDiscrete(location=NULL, parameter='SWE', years=c(2021, 2022), title=TRUE, plot_type = "boxplot", discrete_data = swe_basin, save_path = "")
+
+hydrometDiscrete <- function(location=NULL,
                              parameter,
                              startDay = 1,
                              endDay = 365,
@@ -35,10 +36,11 @@ hydrometDiscrete <- function(location,
                              plot_type = "violin",
                              plot_scale = 1,
                              save_path = NULL,
-                             dbPath = "default")
+                             dbPath = "default",
+                             discrete_data = NULL)
 {
   # Commented code below is for testing...
-  # location = "09EA-M1"
+  # location = "08AA-SC01"
   # parameter = "SWE"
   # startDay = 1
   # endDay = 365
@@ -48,7 +50,8 @@ hydrometDiscrete <- function(location,
   # plot_scale = 1
   # plot_type = "boxplot"
   # save_path = NULL
-  # dbPath = "C:/Users/g_del/Documents/R/KlondikeLandslides/data/hydro.sqlite"
+  # dbPath ="default"
+  # discrete_data = NULL
 
   #TODO Should give a decent error message if the user requests something that doesn't exist. Station not existing, timeseries not existing, years not available (and where they are), etc.
 
@@ -89,96 +92,113 @@ hydrometDiscrete <- function(location,
     }
   }
 
-  #Connect
-  con <- WRBtools::hydroConnect(path = dbPath, silent = TRUE)
-  on.exit(DBI::dbDisconnect(con))
 
-  # Dealing with start/end dates ----------------------
-  # Sort out startDay and endDay into actual dates if needed
-  last_year <- max(years)
-  leap_list <- (seq(1800, 2100, by = 4))  # Create list of all leap years
-  tryCatch({
-    startDay <- as.character(startDay)
-    startDay <- as.POSIXct(startDay, tz = tzone)
-    lubridate::year(startDay) <- last_year
-  }, error = function(e) {
-    if (last_year %in% leap_list){
-      if (startDay > 59){
-        startDay <<- startDay + 1
+  if (is.null(discrete_data)) {
+    #Connect
+    con <- WRBtools::hydroConnect(path = dbPath, silent = TRUE)
+    on.exit(DBI::dbDisconnect(con))
+
+    # Dealing with start/end dates ----------------------
+    # Sort out startDay and endDay into actual dates if needed
+    last_year <- max(years)
+    leap_list <- (seq(1800, 2100, by = 4))  # Create list of all leap years
+    tryCatch({
+      startDay <- as.character(startDay)
+      startDay <- as.POSIXct(startDay, tz = tzone)
+      lubridate::year(startDay) <- last_year
+    }, error = function(e) {
+      if (last_year %in% leap_list){
+        if (startDay > 59){
+          startDay <<- startDay + 1
+        }
       }
-    }
-    startDay <<- as.POSIXct(as.numeric(startDay)*60*60*24, origin = paste0(last_year-1, "-12-31"), tz = "UTC")
-    startDay <<- lubridate::force_tz(startDay, tzone)
-  })
-  tryCatch({
-    endDay <- as.character(endDay)
-    endDay <- as.POSIXct(endDay, tz = tzone)
-    lubridate::year(endDay) <- last_year
-  }, error = function(e) {
-    tempStartDay <- lubridate::yday(startDay) #using yday because start is now in proper Date format and needs to be back-converted to yday
-    if (last_year %in% leap_list){
-      if (endDay > 59){
-        endDay <<- endDay + 1
+      startDay <<- as.POSIXct(as.numeric(startDay)*60*60*24, origin = paste0(last_year-1, "-12-31"), tz = "UTC")
+      startDay <<- lubridate::force_tz(startDay, tzone)
+    })
+    tryCatch({
+      endDay <- as.character(endDay)
+      endDay <- as.POSIXct(endDay, tz = tzone)
+      lubridate::year(endDay) <- last_year
+    }, error = function(e) {
+      tempStartDay <- lubridate::yday(startDay) #using yday because start is now in proper Date format and needs to be back-converted to yday
+      if (last_year %in% leap_list){
+        if (endDay > 59){
+          endDay <<- endDay + 1
+        }
       }
+      endDay <<- as.POSIXct(as.numeric(endDay)*60*60*24, origin = paste0(last_year-1, "-12-31 23:59:59"), tz = "UTC")
+      endDay <<- lubridate::force_tz(endDay, tzone)
+    })
+    if (startDay > endDay){ #if the user is wanting a range overlapping the new year
+      lubridate::year(endDay) <- lubridate::year(endDay)+1
+      overlaps <- TRUE
+    } else {
+      overlaps <- FALSE
     }
-    endDay <<- as.POSIXct(as.numeric(endDay)*60*60*24, origin = paste0(last_year-1, "-12-31 23:59:59"), tz = "UTC")
-    endDay <<- lubridate::force_tz(endDay, tzone)
-  })
-  if (startDay > endDay){ #if the user is wanting a range overlapping the new year
-    lubridate::year(endDay) <- lubridate::year(endDay)+1
-    overlaps <- TRUE
-  } else {
-    overlaps <- FALSE
-  }
 
-  day_seq <- seq.POSIXt(startDay, endDay, by = "day")
+    day_seq <- seq.POSIXt(startDay, endDay, by = "day")
 
-  #Check for existence of timeseries, then for presence of data within the time range requested.
-  exists <- DBI::dbGetQuery(con, paste0("SELECT * FROM timeseries WHERE location = '", location, "' AND parameter = '", parameter, "' AND type = 'discrete'"))
-  if (nrow(exists) == 0){
-    stop("There is no entry for the location and parameter combination that you specified of discrete data type. If you are trying to graph continuous data use hydrometContinuous.")
-  } else if (nrow(exists) > 1){
-    stop("There is more than one entry in the database for the location and parameter that you specified! Please alert the database manager ASAP.")
-  }
-
-
-
-  #Find the ts units
-  units <- DBI::dbGetQuery(con, paste0("SELECT units FROM timeseries WHERE parameter = '", parameter, "' AND location = '", location, "'"))
-
-  # Get the data ---------------------
-  all_discrete <- DBI::dbGetQuery(con, paste0("SELECT * FROM discrete WHERE location = '", location, "' AND parameter = '", parameter, "' AND sample_date < '", paste0(max(years), substr(endDay, 5, 10)), "'"))
-  if (nrow(all_discrete) == 0){
-    stop(paste0("There doesn't appear to be any data for the year and days you specified: this timeseries starts ",  exists$start_datetime_UTC))
-  }
-  all_discrete$target_date <- as.Date(all_discrete$target_date)
-  all_discrete$sample_date <- as.Date(all_discrete$sample_date)
-  all_discrete$year <- lubridate::year(all_discrete$target_date)
-  all_discrete$month <- lubridate::month(all_discrete$target_date)
-  all_discrete$day <- lubridate::day(all_discrete$target_date)
-  #Separate, modify, and re-bind feb29 days, if any
-  feb29 <- all_discrete[all_discrete$month == 2 & all_discrete$day == 29, ]
-  if (nrow(feb29) > 0){
-    all_discrete <- all_discrete[!(all_discrete$month == 2 & all_discrete$day == 29), ]
-    feb29$target_date <- feb29$target_date + 1
-    feb29$month <- 3
-    feb29$day <- 1
-    all_discrete <- rbind(all_discrete, feb29)
-  }
-  #Make a fake date
-  all_discrete$fake_date <- as.Date(gsub("[0-9]{4}", last_year, all_discrete$target_date))
-  discrete <- data.frame()
-  for (i in years){
-    start <- as.Date(paste0(i, substr(startDay, 5, 10)))
-    end <- as.Date(paste0(i, substr(endDay, 5, 10)))
-    if (overlaps){
-      lubridate::year(end) <- lubridate::year(end) +1
+    #Check for existence of timeseries, then for presence of data within the time range requested.
+    exists <- DBI::dbGetQuery(con, paste0("SELECT * FROM timeseries WHERE location = '", location, "' AND parameter = '", parameter, "' AND type = 'discrete'"))
+    if (nrow(exists) == 0){
+      stop("There is no entry for the location and parameter combination that you specified of discrete data type. If you are trying to graph continuous data use hydrometContinuous.")
+    } else if (nrow(exists) > 1){
+      stop("There is more than one entry in the database for the location and parameter that you specified! Please alert the database manager ASAP.")
     }
-    new_discrete <- all_discrete[all_discrete$target_date >= start & all_discrete$target_date <= end , ]
-    discrete <- rbind(discrete, new_discrete)
+
+
+
+    #Find the ts units
+    units <- DBI::dbGetQuery(con, paste0("SELECT units FROM timeseries WHERE parameter = '", parameter, "' AND location = '", location, "'"))
+
+    # Get the data ---------------------
+    all_discrete <- DBI::dbGetQuery(con, paste0("SELECT * FROM discrete WHERE location = '", location, "' AND parameter = '", parameter, "' AND sample_date < '", paste0(max(years), substr(endDay, 5, 10)), "'"))
+    if (nrow(all_discrete) == 0){
+      stop(paste0("There doesn't appear to be any data for the year and days you specified: this timeseries starts ",  exists$start_datetime_UTC))
+    }
+    all_discrete$target_date <- as.Date(all_discrete$target_date)
+    all_discrete$sample_date <- as.Date(all_discrete$sample_date)
+    all_discrete$year <- lubridate::year(all_discrete$target_date)
+    all_discrete$month <- lubridate::month(all_discrete$target_date)
+    all_discrete$day <- lubridate::day(all_discrete$target_date)
+    #Separate, modify, and re-bind feb29 days, if any
+    feb29 <- all_discrete[all_discrete$month == 2 & all_discrete$day == 29, ]
+    if (nrow(feb29) > 0){
+      all_discrete <- all_discrete[!(all_discrete$month == 2 & all_discrete$day == 29), ]
+      feb29$target_date <- feb29$target_date + 1
+      feb29$month <- 3
+      feb29$day <- 1
+      all_discrete <- rbind(all_discrete, feb29)
+    }
+
+    #Make a fake date
+    all_discrete$fake_date <- as.Date(gsub("[0-9]{4}", last_year, all_discrete$target_date))
+    discrete <- data.frame()
+    for (i in years){
+      start <- as.Date(paste0(i, substr(startDay, 5, 10)))
+      end <- as.Date(paste0(i, substr(endDay, 5, 10)))
+      if (overlaps){
+        lubridate::year(end) <- lubridate::year(end) +1
+      }
+      new_discrete <- all_discrete[all_discrete$target_date >= start & all_discrete$target_date <= end , ]
+      discrete <- rbind(discrete, new_discrete)
+    }
+    if (nrow(discrete) == 0){
+      stop("There is no data to graph after filtering for your specified year(s) and day range. Try again with different days.")
+    }
+
   }
-  if (nrow(discrete) == 0){
-    stop("There is no data to graph after filtering for your specified year(s) and day range. Try again with different days.")
+
+  if (!is.null(discrete_data)) {
+    ## Create all_discrete
+    all_discrete <- discrete_data
+    # add fake_date
+    all_discrete$fake_date <- as.Date(paste0(max(years), "-0", all_discrete$month, "-01" ))
+    ## Create discrete
+    discrete <- all_discrete %>% dplyr::filter(year %in% years)
+    ## Give units
+    units <- unique(discrete$units)
+
   }
 
   #Make the plot --------------------
@@ -201,9 +221,20 @@ hydrometDiscrete <- function(location,
 
   # Wrap things up and return() -----------------------
   if (title == TRUE){
-    stn_name <- DBI::dbGetQuery(con, paste0("SELECT name FROM locations where location = '", location, "'"))
+    if (is.null(discrete_data)){
+      stn_name <- DBI::dbGetQuery(con, paste0("SELECT name FROM locations where location = '", location, "'"))
+      titl <- paste0("Location ", location, ": ", stn_name)
+    } else {
+      if (!is.null(location)) {
+        titl <- paste0("Location: ", location)}
+      else {
+        titl <- paste0("Location: ", unique(all_discrete$location))
+        }
+
+    }
+
     plot <- plot +
-      ggplot2::labs(title=paste0("Location ", location, ": ", stn_name)) +
+      ggplot2::labs(title=titl) +
       ggplot2::theme(plot.title=ggplot2::element_text(hjust=0.05, size=14*plot_scale))
   }
 
