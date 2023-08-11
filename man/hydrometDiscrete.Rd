@@ -5,7 +5,7 @@
 \title{Discrete hydromet data plotting}
 \usage{
 hydrometDiscrete(
-  location,
+  location = NULL,
   parameter,
   startDay = 1,
   endDay = 365,
@@ -15,7 +15,8 @@ hydrometDiscrete(
   plot_type = "violin",
   plot_scale = 1,
   save_path = NULL,
-  dbPath = "default"
+  dbPath = "default",
+  discrete_data = NULL
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ hydrometDiscrete(
 \item{save_path}{Default is NULL and the graph will be visible in RStudio and can be assigned to an object. Option "choose" brings up the File Explorer for you to choose where to save the file, or you can also specify a save path directly.}
 
 \item{dbPath}{The path to the local hydromet database, passed to \code{\link[=hydroConnect]{hydroConnect()}}.}
+
+\item{discrete_data}{A dataframe with the data to be plotted. Must contain the following columns: year, month, value and units.}
 }
 \value{
 A .png file of the plot requested (if a save path has been selected), plus the plot displayed in RStudio. Assign the function to a variable to also get a plot in your global environment as a ggplot object which can be further modified
