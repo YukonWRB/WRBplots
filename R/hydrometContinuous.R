@@ -318,6 +318,7 @@ hydrometContinuous <- function(location,
 
   # Make the plot --------------------
   colours = c("blue", "black", "darkorchid3", "cyan2", "firebrick3", "aquamarine4", "gold1", "chartreuse1", "darkorange", "lightsalmon4")
+    # c("black", "#DC4405", "#773F65", "#F2A900", "#244C5A", "#C60D58", "#687C04", "#0097A9", "#7A9A01", "#CD7F32")
   line_size = 1
   minHist <- min(realtime$min, na.rm=TRUE)
   maxHist <- max(realtime$max, na.rm=TRUE)
