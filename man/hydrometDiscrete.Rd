@@ -34,7 +34,7 @@ hydrometDiscrete(
 
 \item{title}{Should a title be included?}
 
-\item{plot_type}{Choose from "violin" or "boxplot".}
+\item{plot_type}{Choose from "violin" , "boxplot" or "linedbox".}
 
 \item{plot_scale}{Adjusts/scales the size of plot text elements. 1 = standard size, 0.5 = half size, 2 = double the size, etc. Standard size works well in a typical RStudio environment.}
 
@@ -54,5 +54,5 @@ Generate plots of snow survey data (SWE and depth) or other variables sampled at
 
 Notice: in many cases, you're better off using the Shiny app at \code{\link[WRBfloods:hydroApp]{WRBfloods::hydroApp()}} to generate and export your plot. Read on if you need additional control over the final product.
 
-This function plots data from the local hydrometric database (maintained by the WRBdatabase package) and yields consistent-looking plots for discrete data. This function can only plot what's in the database, use the function \code{\link[=DB_browse_ts]{DB_browse_ts()}} to see what's in there first. Data can be represented as violin plots or as regular box plots.
+This function plots data from the local hydrometric database (maintained by the WRBdatabase package) and yields consistent-looking plots for discrete data. This function can only plot what's in the database, use the function \code{\link[=DB_browse_ts]{DB_browse_ts()}} to see what's in there first. Data can be represented as violin plots, as regular box plots or as a 'linedbox' plot (imitates plots currently used in the snow bulletin).
 }

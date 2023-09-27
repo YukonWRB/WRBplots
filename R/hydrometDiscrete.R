@@ -7,7 +7,7 @@
 #'
 #' Notice: in many cases, you're better off using the Shiny app at [WRBfloods::hydroApp()] to generate and export your plot. Read on if you need additional control over the final product.
 #'
-#' This function plots data from the local hydrometric database (maintained by the WRBdatabase package) and yields consistent-looking plots for discrete data. This function can only plot what's in the database, use the function [DB_browse_ts()] to see what's in there first. Data can be represented as violin plots or as regular box plots.
+#' This function plots data from the local hydrometric database (maintained by the WRBdatabase package) and yields consistent-looking plots for discrete data. This function can only plot what's in the database, use the function [DB_browse_ts()] to see what's in there first. Data can be represented as violin plots, as regular box plots or as a 'linedbox' plot (imitates plots currently used in the snow bulletin).
 #'
 #' @param location The location for which you want a plot.
 #' @param parameter The parameter you wish to plot. The location:parameter combo must be in the local database.
@@ -16,7 +16,7 @@
 #' @param tzone The timezone to use for fetching data. Datetimes are stored in the database in UTC offset, so this parameter could make a difference to what day a particular sample is considered to be on. In most cases you can ignore this parameter.
 #' @param years The years to plot. If `startDay` and `endDay` cover December 31 - January 1, select the December year(s). Max 10 years, NULL = current year.
 #' @param title Should a title be included?
-#' @param plot_type Choose from "violin" or "boxplot".
+#' @param plot_type Choose from "violin" , "boxplot" or "linedbox".
 #' @param plot_scale Adjusts/scales the size of plot text elements. 1 = standard size, 0.5 = half size, 2 = double the size, etc. Standard size works well in a typical RStudio environment.
 #' @param save_path Default is NULL and the graph will be visible in RStudio and can be assigned to an object. Option "choose" brings up the File Explorer for you to choose where to save the file, or you can also specify a save path directly.
 #' @param dbPath The path to the local hydromet database, passed to [hydroConnect()].
@@ -70,7 +70,7 @@ hydrometDiscrete <- function(location=NULL,
   }
 
   plot_type <- tolower(plot_type)
-  if (!(plot_type %in% c("violin", "boxplot"))){
+  if (!(plot_type %in% c("violin", "boxplot", "linedbox"))){
     stop("Parameter 'plot_type' must be one of 'violin' or 'boxplot'")
   }
 
@@ -195,20 +195,50 @@ hydrometDiscrete <- function(location=NULL,
     # add fake_date
     all_discrete$fake_date <- as.Date(paste0(max(years), "-0", all_discrete$month, "-01" ))
     ## Create discrete
-    discrete <- all_discrete %>% dplyr::filter(year %in% years)
+    #discrete <- all_discrete %>% dplyr::filter(year %in% years)
+    discrete <- all_discrete[all_discrete$year %in% years, ]
     ## Give units
     units <- unique(discrete$units)
 
   }
 
+  if (plot_type == 'linedbox') {
+    stats_discrete <- all_discrete %>%
+      dplyr::group_by(month) %>%
+      dplyr::summarise(value = min(value), type = "min") %>%
+      dplyr::bind_rows(all_discrete %>%
+                  group_by(month) %>%
+                  dplyr::summarise(value = max(value), type = "max")) %>%
+      dplyr::bind_rows(all_discrete %>%
+                  group_by(month) %>%
+                  dplyr::summarise(value = stats::median(value), type = "median"))
+
+    stats_discrete$fake_date <- as.Date(paste0(max(years), "-", stats_discrete$month, "-01"))
+
+  }
+
   #Make the plot --------------------
   colours = c("blue", "black", "darkorchid3", "cyan2", "firebrick3", "aquamarine4", "gold1", "chartreuse1", "darkorange", "lightsalmon4")
+  # c("black", "#DC4405", "#512A44", "#F2A900", "#244C5A", "#687C04", "#C60D58", "#0097A9", "#7A9A01", "#834333")
   legend_length <- length(years)
   plot <- ggplot2::ggplot(all_discrete, ggplot2::aes(x = fake_date, y = value, group = fake_date)) +
     ggplot2::labs(x = "", y = if (parameter == "SWE") paste0("SWE (", units, ")") else paste0(stringr::str_to_title(parameter), " (", units, ")")) +
     ggplot2::theme_classic() +
     ggplot2::theme(legend.position = "right", legend.justification = c(0, 0.95), legend.text = ggplot2::element_text(size = 8*plot_scale), legend.title = ggplot2::element_text(size = 10*plot_scale), axis.title.y = ggplot2::element_text(size = 12*plot_scale), axis.text.x = ggplot2::element_text(size = 9*plot_scale), axis.text.y = ggplot2::element_text(size = 9*plot_scale))
-  if (plot_type == "violin") {
+
+  if (plot_type == "linedbox") {
+    for (m in unique(stats_discrete$month)) {
+      plot <- plot +
+        ggplot2::geom_rect(data = stats_discrete[stats_discrete$month == m,],   fill = 'grey87', ggplot2::aes(xmin=fake_date - 12, xmax=fake_date + 12, ymin=min(value), ymax=max(value)))
+    }
+    plot <- plot +
+      ggplot2::geom_segment(data = stats_discrete, linewidth = plot_scale*1.5,
+                            ggplot2::aes(color=type, yend=value,
+                                         x=fake_date - 12, xend=fake_date + 12)) +
+      ggplot2::scale_color_manual(name = "", labels = c("Maximum", "Median", "Minimum"), values=c("#0097A9", "#7A9A01", "#834333")) +
+      ggnewscale::new_scale_color()
+
+  } else if (plot_type == "violin") {
     plot <- plot +
       ggplot2::geom_violin(draw_quantiles = c(0.5), adjust = 0.7, width = 12, alpha = 0.8, fill = "aliceblue", scale = "width") #Using a scale other than "width" may result in issues for locations where there are many "0" values.
   } else if (plot_type == "boxplot"){
@@ -229,7 +259,7 @@ hydrometDiscrete <- function(location=NULL,
         titl <- paste0("Location: ", location)}
       else {
         titl <- paste0("Location: ", unique(all_discrete$location))
-        }
+      }
 
     }
 
